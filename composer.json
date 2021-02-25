@@ -1,0 +1,29 @@
+{
+    "name": "emizoripx/prepago-bags",
+    "description": "shop prepago-bags in emizor5",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alvaro Molina",
+            "email": "remberto.molina@ipxserver.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+
+    "autoload":{
+        "psr-4":{
+
+            "EmizorIpx\\PrepagoBags\\":"src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "EmizorIpx\\PrepagoBags\\PrepagoBagsServiceProvider"
+            ]
+            
+        }
+    }
+}
