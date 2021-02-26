@@ -15,11 +15,12 @@ class PrepagoBagResource extends JsonResource
     public function toArray($request)
     {
         return [
-            "id" => $this->id,
-            "nombre" => $this->name,
-            "numeroFacturas" => $this->number_invoices,
-            "frecuencia" => $this->frequency,
-            "acumulativo" => $this->acumulative
+            "id" => $this->encodePrimaryKey($this->id),
+            "name" => $this->name,
+            "number_invoices" => $this->number_invoices,
+            "frequency" => $this->frequency,
+            "acumulative" => boolval($this->acumulative),
+            "created_at" => strtotime($this->created_at)
         ];
     }
 }

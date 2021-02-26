@@ -2,17 +2,21 @@
 
 namespace EmizorIpx\PrepagoBags\Http\Controllers;
 
-
+use App\Utils\Traits\MakesHash;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use EmizorIpx\PrepagoBags\Http\Requests\StorePrepagoBagResquest as RequestsStorePrepagoBagResquest;
 use EmizorIpx\PrepagoBags\Http\Resources\PrepagoBagResource;
 use EmizorIpx\PrepagoBags\Models\PrepagoBag;
 use Exception;
+use Hashids\Hashids;
 use Illuminate\Support\Facades\Log;
 
 class PrepagoBagController extends Controller
 {
+
+    use MakesHash;
+    
     public function store(RequestsStorePrepagoBagResquest $request){
 
         $data = $request->all();
@@ -24,7 +28,7 @@ class PrepagoBagController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $prepagoBag
+                'data' => new PrepagoBagResource($prepagoBag)
             ]);
 
 
@@ -48,8 +52,12 @@ class PrepagoBagController extends Controller
 
         $data = $request->all();
 
+        // $hashids = new Hashids(config('ninja.hash_salt'), 10);
+
+        $idBagDecode = $this->decodePrimaryKey($id_bag);
+
         try {
-            $prepagoBag = PrepagoBag::where('id', $id_bag)->first();
+            $prepagoBag = PrepagoBag::where('id', $idBagDecode)->first();
 
             if(!$prepagoBag){
                 return response()->json([
@@ -61,7 +69,8 @@ class PrepagoBagController extends Controller
             $prepagoBag->update($data);
 
             return response()->json([
-                "success" =>true
+                "success" =>true,
+                "data" => new PrepagoBagResource($prepagoBag)
             ]);
 
         } catch (Exception $ex) {
@@ -75,8 +84,12 @@ class PrepagoBagController extends Controller
 
     public function delete($id_bag){
 
+        // $hashids = new Hashids(config('ninja.hash_salt'), 10);
+
+        $idBagDecode = $this->decodePrimaryKey($id_bag);
+
         try {
-            $prepagoBag = PrepagoBag::find($id_bag);
+            $prepagoBag = PrepagoBag::where('id', $idBagDecode)->first();
 
             if(!$prepagoBag){
                 return response()->json([
@@ -101,7 +114,10 @@ class PrepagoBagController extends Controller
     }
 
     public function show($id_bag){
-        $prepagoBag = PrepagoBag::find($id_bag);
+
+        $idBagDecode = $this->decodePrimaryKey($id_bag);
+        
+        $prepagoBag = PrepagoBag::find($idBagDecode);
 
         if(!$prepagoBag){
             return response()->json([
