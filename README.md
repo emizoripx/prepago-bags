@@ -1,4 +1,4 @@
-# PREPAGO BAGS PACKAGE v1.0
+# PREPAGO BAGS PACKAGE v1.0.0
 
 
 ## Api routes
