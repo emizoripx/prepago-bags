@@ -1,5 +1,6 @@
 # PREPAGO BAGS PACKAGE v1.0.0
 
+## Library to manage prepago-bags in emizor5
 
 ## Api routes
 
