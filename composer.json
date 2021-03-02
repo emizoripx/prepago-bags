@@ -10,7 +10,9 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {},
+    "require": {
+        "emizoripx/payment-qr-bcp":"dev-master"
+    },
 
     "autoload":{
         "psr-4":{
