@@ -31,7 +31,8 @@ class StorePrepagoBagResquest extends FormRequest
                 'required',
                 Rule::in(['monthly', 'yearly'])
             ],
-            'acumulative' => 'required|bool'
+            'acumulative' => 'required|bool',
+            'amount' => 'required|numeric'
         ];
     }
 

@@ -20,6 +20,7 @@ class PrepagoBagResource extends JsonResource
             "number_invoices" => $this->number_invoices,
             "frequency" => $this->frequency,
             "acumulative" => boolval($this->acumulative),
+            "amount" => (float) $this->amount,
             "created_at" => strtotime($this->created_at)
         ];
     }
