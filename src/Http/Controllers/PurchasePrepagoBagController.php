@@ -3,6 +3,7 @@
 namespace EmizorIpx\PrepagoBags\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Utils\Traits\MakesHash;
 use EmizorIpx\PaymentQrBcp\Services\BCPService;
 use EmizorIpx\PrepagoBags\Models\PrepagoBag;
 use Illuminate\Support\Facades\Request;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Request;
 
 class PurchasePrepagoBagController extends Controller
 {
-
+    use MakesHash;
     protected $bcpService;
     public function __construct(BCPService $bcpService)
     {
