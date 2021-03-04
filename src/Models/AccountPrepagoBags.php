@@ -2,6 +2,8 @@
 
 namespace EmizorIpx\PrepagoBags\Models;
 
+use Carbon\Carbon;
+use EmizorIpx\PrepagoBags\Exceptions\PrepagoBagsException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
@@ -39,6 +41,20 @@ class AccountPrepagoBags extends Model
             $account->update($data);
 
             return self::whereAccountId($data['account_id'])->first();
+        }
+    }
+
+    public function checkBagDuedate(){
+        $dateNow = Carbon::now();
+
+        if($dateNow->greaterThan($this->duedate)){
+            throw new PrepagoBagsException("Su bolsa prepago ha expirado");
+        }
+    }
+
+    public function checkInvoiceAvailable(){
+        if($this->invoice_number_available <=  0){
+            throw new PrepagoBagsException("Facturas no diponibles para emitir");
         }
     }
 }
