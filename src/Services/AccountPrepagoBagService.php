@@ -18,10 +18,12 @@ class AccountPrepagoBagService {
 
         $accountDetail = AccountPrepagoBags::where('account_id', $account_id)->first();
 
-        
+        if (! empty($accountDetail)) {
+
             $accountDetail->checkBagDuedate();
-            
             $accountDetail->checkInvoiceAvailable();
+        }
+            
 
         
     }
