@@ -4,6 +4,7 @@
 namespace EmizorIpx\PrepagoBags\Repository;
 
 use Carbon\Carbon;
+use EmizorIpx\PrepagoBags\Models\PrepagoBag;
 use EmizorIpx\PrepagoBags\Utils\TypeFrequency;
 
 class AccountPrepagoBagsRepository{

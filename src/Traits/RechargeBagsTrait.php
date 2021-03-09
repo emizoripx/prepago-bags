@@ -17,11 +17,12 @@ trait RechargeBagsTrait {
         
         try {
             $bag = PrepagoBag::where('id', $prepagoBagId)->first();
-
+            Log::debug($prepagoBagId);
             $account_repo = new AccountPrepagoBagsRepository();
 
             $number_invoice_before = AccountPrepagoBags::getInvoiceAvailable($account_id);
             Log::debug($number_invoice_before);
+            
 
             $accountDetails = AccountPrepagoBags::createOrUpdate([
                 'account_id' => $account_id,
