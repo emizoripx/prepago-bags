@@ -33,7 +33,7 @@ trait RechargeBagsTrait {
             
             Log::debug($accountDetails);
             
-            $dataHistorial = $account_repo->setDataHistorial($accountDetails, $number_invoice_before, $bag->number_invoices);
+            $dataHistorial = $account_repo->setDataHistorial($accountDetails, $number_invoice_before, $bag->number_invoices, $bag->id);
             
             Log::debug($dataHistorial);
 
