@@ -33,8 +33,8 @@ class AccountPrepagoBagService {
         
     }
 
-    public function addBagFree($account_id){
-        Log::debug('Add bag Free');
+    public function addBagGift($account_id){
+        Log::debug('Add bag Gift');
         try {
             $bagFree = PrepagoBag::where('amount', 0)->first();
 
@@ -51,4 +51,12 @@ class AccountPrepagoBagService {
             bitacora_error('AccountPrepagoBagService:addBagFree', $ex->getMessage());
         }
     }
+
+    public function addBagFree($account_id, $bag_id){
+        Log::debug('Add bag Free');
+
+        $this->rechargePrepagoBags($account_id, $bag_id);
+    }
+
+
 }

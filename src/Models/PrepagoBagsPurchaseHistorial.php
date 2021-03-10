@@ -16,7 +16,11 @@ class PrepagoBagsPurchaseHistorial extends Model
         self::create($data);
     }
 
-    public static function checkPrepagoFree($accoun_id){
+    public static function checkPrepagoBagGift($accoun_id){
         return self::where('account_id', $accoun_id)->where('bag_id', 1)->exists();
+    }
+
+    public static function checkPrepagoBagFree($accoun_id, $bag_id){
+        return self::where('account_id', $accoun_id)->where('bag_id', $bag_id)->exists();
     }
 }

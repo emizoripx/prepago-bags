@@ -2,10 +2,11 @@
 
 namespace EmizorIpx\PrepagoBags\Http\Requests;
 
+use EmizorIpx\PrepagoBags\Http\ValidationRules\CheckAcumulativeBag;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StorePrepagoBagResquest extends FormRequest
+class StorePrepagoBagRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,6 +25,7 @@ class StorePrepagoBagResquest extends FormRequest
      */
     public function rules()
     {
+        \Log::debug(request()->amount);
         return [
             'number_invoices' => 'required|integer',
             'name' => 'required|string',
@@ -31,8 +33,12 @@ class StorePrepagoBagResquest extends FormRequest
                 'required',
                 Rule::in(['monthly', 'yearly'])
             ],
-            'acumulative' => 'required|bool',
-            'amount' => 'required|numeric'
+            'amount' => 'required|numeric',
+            'acumulative' => [
+                'required',
+                'bool',
+                new CheckAcumulativeBag(request()->amount)
+            ]
         ];
     }
 

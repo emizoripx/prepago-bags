@@ -5,9 +5,11 @@ namespace EmizorIpx\PrepagoBags\Http\Controllers;
 use App\Utils\Traits\MakesHash;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use EmizorIpx\PrepagoBags\Http\Requests\StorePrepagoBagResquest as RequestsStorePrepagoBagResquest;
+use EmizorIpx\PrepagoBags\Http\Requests\StorePrepagoBagRequest as RequestsStorePrepagoBagRequest;
 use EmizorIpx\PrepagoBags\Http\Resources\PrepagoBagResource;
 use EmizorIpx\PrepagoBags\Models\PrepagoBag;
+use EmizorIpx\PrepagoBags\Models\PrepagoBagsPurchaseHistorial;
+use EmizorIpx\PrepagoBags\Services\AccountPrepagoBagService;
 use Exception;
 use Hashids\Hashids;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +19,7 @@ class PrepagoBagController extends Controller
 
     use MakesHash;
     
-    public function store(RequestsStorePrepagoBagResquest $request){
+    public function store(RequestsStorePrepagoBagRequest $request){
 
         $data = $request->all();
 
@@ -48,7 +50,7 @@ class PrepagoBagController extends Controller
         ]);
     }
 
-    public function update(RequestsStorePrepagoBagResquest $request, $id_bag){
+    public function update(RequestsStorePrepagoBagRequest $request, $id_bag){
 
         $data = $request->all();
 
@@ -129,5 +131,32 @@ class PrepagoBagController extends Controller
         return response()->json([
             "data" => new PrepagoBagResource($prepagoBag)
         ]);
+    }
+
+    public function getBagFree($id_bag){
+        $idBagDecode = $this->decodePrimaryKey($id_bag);
+
+        Log::debug('GET Bag Free');
+        Log::debug(auth()->user()->getCompany()->account_id);
+        try {
+            if(PrepagoBagsPurchaseHistorial::checkPrepagoBagFree(auth()->user()->getCompany()->account_id, $idBagDecode)){
+                throw new Exception("Ya Adquirió esta bolsa Gratis anteriormente");
+            }
+
+            $bagService = new AccountPrepagoBagService();
+
+            $bagService->addBagFree(auth()->user()->getCompany()->account_id, $idBagDecode);
+
+            return response()->json([
+                'success' => true
+            ]);
+
+        } catch (Exception $ex) {
+            return response()->json([
+                'success' => false,
+                'msg' => $ex->getMessage()
+            ]);
+        }
+
     }
 }

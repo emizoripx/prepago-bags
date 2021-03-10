@@ -15,6 +15,6 @@ class AccountObserver {
 
     public function created($account){
         \Log::debug($account);
-        $this->service->addBagFree($account->id);
+        $this->service->addBagGift($account->id);
     }
 }

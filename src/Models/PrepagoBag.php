@@ -17,7 +17,7 @@ class PrepagoBag extends Model
 
 
     public static function getAllBags($account_id){
-        if(PrepagoBagsPurchaseHistorial::checkPrepagoFree($account_id)){
+        if(PrepagoBagsPurchaseHistorial::checkPrepagoBagGift($account_id)){
             return self::where('id', '<>', 1)->get();
         }
         else{
