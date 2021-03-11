@@ -27,7 +27,7 @@ class AccountPrepagoBags extends Model
         
     }
 
-
+    
     
     public static function createOrUpdate($data){
         $account = self::where('account_id', $data['account_id'])->first();
@@ -57,4 +57,21 @@ class AccountPrepagoBags extends Model
             throw new PrepagoBagsException("Facturas no diponibles para emitir");
         }
     }
+
+
+    public function addNumberInvoice(){
+        $this->invoice_number_available = $this->invoice_number_available + 1;
+        \Log::debug('Sumar numero de Factura');
+        \Log::debug($this->invoice_number_available);
+        return $this;
+    }
+
+    public function reduceNumberInvoice(){
+        $this->invoice_number_available = $this->invoice_number_available - 1;
+        \Log::debug('Restar numero de Factura');
+        \Log::debug($this->invoice_number_available);
+        return $this;
+    }
+
+    
 }
