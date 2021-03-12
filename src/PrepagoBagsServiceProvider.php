@@ -42,5 +42,9 @@ class PrepagoBagsServiceProvider extends ServiceProvider
         
         // $account = $this->app->make(Config::get('prepagobag.entity_table_account'));
         Account::observe(new AccountObserver(new AccountPrepagoBagService));
+
+
+        // VITAS
+        $this->loadViewsFrom(__DIR__.'/Resource/views', 'prepagobags');
     }
 }
