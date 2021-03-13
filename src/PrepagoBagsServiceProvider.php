@@ -3,6 +3,7 @@
 namespace EmizorIpx\PrepagoBags;
 
 use App\Models\Account;
+use App\Models\Company;
 use EmizorIpx\PrepagoBags\Observers\AccountObserver;
 use EmizorIpx\PrepagoBags\Services\AccountPrepagoBagService;
 use Illuminate\Support\Facades\Config;
@@ -41,7 +42,7 @@ class PrepagoBagsServiceProvider extends ServiceProvider
         // // Obeservers
         
         // $account = $this->app->make(Config::get('prepagobag.entity_table_account'));
-        Account::observe(new AccountObserver(new AccountPrepagoBagService));
+        Company::observe(new AccountObserver(new AccountPrepagoBagService));
 
 
         // VITAS

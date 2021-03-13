@@ -16,8 +16,8 @@ class PrepagoBag extends Model
     protected $fillable = ['number_invoices', 'name','frequency', 'acumulative', 'amount'];
 
 
-    public static function getAllBags($account_id){
-        if(PrepagoBagsPurchaseHistorial::checkPrepagoBagGift($account_id)){
+    public static function getAllBags($company_id){
+        if(PrepagoBagsPurchaseHistorial::checkPrepagoBagGift($company_id)){
             return self::where('id', '<>', 1)->get();
         }
         else{

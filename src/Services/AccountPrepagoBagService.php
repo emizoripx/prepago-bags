@@ -15,13 +15,13 @@ class AccountPrepagoBagService {
 
     use RechargeBagsTrait;
 
-    public function controlPrepagoBag($account_id){
+    public function controlPrepagoBag($company_id){
 
         $hashid = new Hashids(config('ninja.hash_salt'), 10);
 
-        $account_id = $hashid->decode($account_id);
+        $company_id = $hashid->decode($company_id);
 
-        $accountDetail = AccountPrepagoBags::where('account_id', $account_id)->first();
+        $accountDetail = AccountPrepagoBags::where('company_id', $company_id)->first();
 
         if (! empty($accountDetail)) {
 
@@ -33,7 +33,7 @@ class AccountPrepagoBagService {
         
     }
 
-    public function addBagGift($account_id){
+    public function addBagGift($company_id){
         Log::debug('Add bag Gift');
         try {
             $bagFree = PrepagoBag::where('amount', 0)->first();
@@ -42,7 +42,7 @@ class AccountPrepagoBagService {
             Log::debug($bagFree->id);
             
             if(!empty($bagFree)){
-                $this->rechargePrepagoBags($account_id, $bagFree->id);
+                $this->rechargePrepagoBags($company_id, $bagFree->id);
             }
             else{
                 bitacora_info("AccountPrepagoBagService:addBagFree", "PrepagoBags gratis no encontrado");
@@ -52,10 +52,10 @@ class AccountPrepagoBagService {
         }
     }
 
-    public function addBagFree($account_id, $bag_id){
+    public function addBagFree($company_id, $bag_id){
         Log::debug('Add bag Free');
 
-        $this->rechargePrepagoBags($account_id, $bag_id);
+        $this->rechargePrepagoBags($company_id, $bag_id);
     }
 
 

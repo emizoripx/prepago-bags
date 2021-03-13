@@ -137,15 +137,15 @@ class PrepagoBagController extends Controller
         $idBagDecode = $this->decodePrimaryKey($id_bag);
 
         Log::debug('GET Bag Free');
-        Log::debug(auth()->user()->getCompany()->account_id);
+        Log::debug(auth()->user()->getCompany()->id);
         try {
-            if(PrepagoBagsPurchaseHistorial::checkPrepagoBagFree(auth()->user()->getCompany()->account_id, $idBagDecode)){
+            if(PrepagoBagsPurchaseHistorial::checkPrepagoBagFree(auth()->user()->getCompany()->id, $idBagDecode)){
                 throw new Exception("Ya Adquirió esta bolsa Gratis anteriormente");
             }
 
             $bagService = new AccountPrepagoBagService();
 
-            $bagService->addBagFree(auth()->user()->getCompany()->account_id, $idBagDecode);
+            $bagService->addBagFree(auth()->user()->getCompany()->id, $idBagDecode);
 
             return response()->json([
                 'success' => true

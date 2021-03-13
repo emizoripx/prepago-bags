@@ -12,11 +12,11 @@ class AccountPrepagoBags extends Model
 {
     protected $table = 'account_prepago_bags';
 
-    protected $fillable = ['account_id', 'invoice_number_available', 'acumulative', 'duedate'];
+    protected $fillable = ['company_id', 'invoice_number_available', 'acumulative', 'duedate', 'production', 'delete', 'deleted_at', 'is_postpago', 'invoice_counter', 'enabled'];
 
 
-    public static function getInvoiceAvailable($account_id){
-        $account = self::where('account_id', $account_id)->first();
+    public static function getInvoiceAvailable($company_id){
+        $account = self::where('company_id', $company_id)->first();
         // dd($account);
         if(is_null($account)){
             return 0;
@@ -30,7 +30,7 @@ class AccountPrepagoBags extends Model
     
     
     public static function createOrUpdate($data){
-        $account = self::where('account_id', $data['account_id'])->first();
+        $account = self::where('company_id', $data['company_id'])->first();
 
         Log::debug($data);
         if(empty($account)){
@@ -40,7 +40,7 @@ class AccountPrepagoBags extends Model
             
             $account->update($data);
 
-            return self::whereAccountId($data['account_id'])->first();
+            return self::whereCompanyId($data['company_id'])->first();
         }
     }
 

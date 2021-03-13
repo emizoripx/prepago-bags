@@ -21,7 +21,7 @@ class AccountPrepagoBagsRepository{
     public function setDataHistorial( $account, $number_invoice_before, $number_invoices, $bag_id){
         return [
             'purchase_date' => $account->updated_at,
-            'account_id' => $account->account_id,
+            'company_id' => $account->company_id,
             'number_invoices' => $number_invoices,
             'number_invoices_before' => $number_invoice_before,
             'bag_id' => $bag_id

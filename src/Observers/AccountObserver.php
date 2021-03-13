@@ -13,8 +13,11 @@ class AccountObserver {
         $this->service = $service;
     }
 
-    public function created($account){
-        \Log::debug($account);
-        $this->service->addBagGift($account->id);
+    public function created($company){
+        \Log::debug('Bolsa de Regalo');
+        \Log::debug($company);
+        \Log::debug('Bolsa de Regalo company id');
+        \Log::debug($company->id);
+        $this->service->addBagGift($company->id);
     }
 }

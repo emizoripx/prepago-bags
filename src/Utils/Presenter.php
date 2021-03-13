@@ -10,10 +10,10 @@ use Illuminate\Support\Facades\Log;
 class Presenter {
 
 
-    public static function appendBagsFelData($data, $account_id){
+    public static function appendBagsFelData($data, $company_id){
         Log::debug('AppendBags');
-        Log::debug($account_id);
-        $data['fel_data']['bags'] = PrepagoBagResource::collection( PrepagoBag::getAllBags($account_id) );
+        Log::debug($company_id);
+        $data['fel_data']['bags'] = PrepagoBagResource::collection( PrepagoBag::getAllBags($company_id) );
 
         return $data;
     }

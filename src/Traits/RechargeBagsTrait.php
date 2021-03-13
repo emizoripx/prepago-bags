@@ -13,19 +13,19 @@ use Illuminate\Support\Facades\Log;
 
 trait RechargeBagsTrait {
 
-    public function rechargePrepagoBags($account_id, $prepagoBagId){
+    public function rechargePrepagoBags($company_id, $prepagoBagId){
         
         try {
             $bag = PrepagoBag::where('id', $prepagoBagId)->first();
             Log::debug($prepagoBagId);
             $account_repo = new AccountPrepagoBagsRepository();
 
-            $number_invoice_before = AccountPrepagoBags::getInvoiceAvailable($account_id);
+            $number_invoice_before = AccountPrepagoBags::getInvoiceAvailable($company_id);
             Log::debug($number_invoice_before);
             
 
             $accountDetails = AccountPrepagoBags::createOrUpdate([
-                'account_id' => $account_id,
+                'company_id' => $company_id,
                 'invoice_number_available' => $account_repo->updateInvoicesAvailable($number_invoice_before, $bag),
                 'acumulative' => $bag->acumulative,
                 'duedate' => $account_repo->setDueDate($bag)
