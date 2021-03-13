@@ -73,5 +73,9 @@ class AccountPrepagoBags extends Model
         return $this;
     }
 
+    public function checkIsPostpago(){
+        return $this->is_postpago;
+    }
+
     
 }
