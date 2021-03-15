@@ -45,7 +45,7 @@ class PrepagoBagsServiceProvider extends ServiceProvider
         Company::observe(new AccountObserver(new AccountPrepagoBagService));
 
 
-        // VITAS
+        // VISTAS
         $this->loadViewsFrom(__DIR__.'/Resource/views', 'prepagobags');
     }
 }

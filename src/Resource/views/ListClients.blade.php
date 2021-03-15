@@ -11,15 +11,22 @@
         <h3>Clientes</h3>
         <table class="table table-striped table-bordered" style="table-layout: fixed;">
             <thead>
-                <th width="60%">Email</th>
-                <th width="20%">Tipo de Cuenta</th>
+                <th width="50%">Compañia</th>
+                <th width="10%">Producción</th>
+                <th width="10%">Tipo de Cuenta</th>
+                <th width="10%">Estado</th>
                 <th width="20%">Acciones</th>
             </thead>
             <tbody>
                 @foreach($clientsPrepago as $client)
                     <tr>
-                        <td>{{ $client->email }}</td>
-                        <td>{{ $client->production }}</td>
+                        <td>{{ json_decode($client->settings)->name }}</td>
+                        <td align="center">{{ $client->production }}</td>
+                        <td align="center">{{ $client->is_postpago }}</td>
+                        <td align="center">{{ $client->enabled }}</td>
+                        <td align="center">
+                            <button>Dar alta</button>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
