@@ -54,7 +54,7 @@ class AccountPrepagoBags extends Model
 
     public function checkInvoiceAvailable(){
         if($this->invoice_number_available <=  0){
-            throw new PrepagoBagsException("Facturas no diponibles para emitir");
+            throw new PrepagoBagsException("Facturas no diponibles para emitir. Adquirir un nuevo plan.");
         }
     }
 
