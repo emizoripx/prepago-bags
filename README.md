@@ -55,3 +55,32 @@
             }
 
 ```
+
+
+## Added exception in shop
+
+- Added exception in invoice emit in shop `App\Http\Controllers\Shop\InvoiceController.php`
+
+```php
+        
+        <?php
+
+
+            namespace App\Http\Controllers;
+
+
+
+            class InvoiceController extends BaseController
+            {
+                ...
+                    // EMIZOR-INVOICE-INSERT
+                    try {
+                        $invoice->emit();
+                    } catch (Exception $ex) {
+                        return response(['message' => $ex->getMessage()]);;
+                    }
+                ...
+                }
+            }
+
+```

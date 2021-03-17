@@ -21,7 +21,7 @@ class AccountPrepagoBagService {
 
         $company_id = $hashid->decode($company_id);
 
-        $accountDetail = AccountPrepagoBags::where('company_id', $company_id)->first();
+        $accountDetail = AccountPrepagoBags::where('company_id', $company_id)->where('is_postpago', false)->first();
 
         if (! empty($accountDetail)) {
 

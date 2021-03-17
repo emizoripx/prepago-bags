@@ -12,7 +12,7 @@ class AccountPrepagoBags extends Model
 {
     protected $table = 'account_prepago_bags';
 
-    protected $fillable = ['company_id', 'invoice_number_available', 'acumulative', 'duedate', 'production', 'delete', 'deleted_at', 'is_postpago', 'invoice_counter', 'enabled'];
+    protected $fillable = ['company_id', 'invoice_number_available', 'acumulative', 'duedate', 'production', 'delete', 'deleted_at', 'is_postpago', 'invoice_counter', 'enabled', 'phase'];
 
 
     public static function getInvoiceAvailable($company_id){
@@ -54,7 +54,7 @@ class AccountPrepagoBags extends Model
 
     public function checkInvoiceAvailable(){
         if($this->invoice_number_available <=  0){
-            throw new PrepagoBagsException("Facturas no diponibles para emitir");
+            throw new PrepagoBagsException("Facturas no diponibles para emitir. Adquirir un nuevo plan.");
         }
     }
 
@@ -71,6 +71,22 @@ class AccountPrepagoBags extends Model
         \Log::debug('Restar numero de Factura');
         \Log::debug($this->invoice_number_available);
         return $this;
+    }
+
+    public function checkIsPostpago(){
+        return $this->is_postpago;
+    }
+
+    public function getAccountTypeBadgeAttribute()
+    {
+        $color = "success";
+        $name = "PREPAGO";
+        if ($this->is_postpago) {
+            $color = "info";
+            $name = "POSTPAGO";
+        }
+
+        return "<span class='badge badge-$color'>$name</span>";
     }
 
     

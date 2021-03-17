@@ -2,33 +2,24 @@
 
 namespace EmizorIpx\PrepagoBags\Http\Controllers;
 
-use Illuminate\Http\Request;
+use EmizorIpx\PrepagoBags\Models\AccountPrepagoBags;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
     public function clientsList(){
         
+     
+        $clientsPrepago = AccountPrepagoBags::rightJoin('companies', 'account_prepago_bags.company_id', '=', 'companies.id')
+                                            ->leftJoin('users','users.account_id','=','companies.account_id')
+                                            // ->leftJoin('company_user', 'company_user.user_id','=','users.id')
+                    ->select('account_prepago_bags.id', 'companies.settings' ,'account_prepago_bags.production', 'account_prepago_bags.is_postpago', 'account_prepago_bags.enabled', 'account_prepago_bags.phase')
+                    ->where('account_prepago_bags.delete', '=', false)
+                    // ->where('company_user.is_owner', 1)
+                    ->simplePaginate(30);
 
-        // $clientsPrepago = DB::table('account_prepago_bags')
-        //             ->join('users', 'account_prepago_bags.account_id', '=', 'users.account_id')
-        //             ->select('account_prepago_bags.id', 'users.email' ,'account_prepago_bags.production')
-        //             ->where('account_prepago_bags.delete', '=', false)
-        //             ->get();
 
-        // // $clientsPostpago = DB::table('account_postpago')
-        // //                     ->join('users', 'account_postpago.account_id', '=', 'users.account_id')
-        // //                     ->where('account_postpago.enabled', '=' ,true)
-        // //                     ->select('users.id','users.email' , 'account_postpago.production')
-        // //                     ->get();
-        
-        // // Log::debug($clientsPostpago);
-        // // Log::debug($clientsPrepago);
-        // // $clientsPrepago[] = $clientsPostpago;
-        // return view('prepagobags::ListClients', compact('clientsPrepago'));
-        // // return $clientsPrepago;
+        return view('prepagobags::ListClients', compact('clientsPrepago'));
 
     }
 }
