@@ -12,7 +12,7 @@ class AccountPrepagoBags extends Model
 {
     protected $table = 'account_prepago_bags';
 
-    protected $fillable = ['company_id', 'invoice_number_available', 'acumulative', 'duedate', 'production', 'delete', 'deleted_at', 'is_postpago', 'invoice_counter', 'enabled'];
+    protected $fillable = ['company_id', 'invoice_number_available', 'acumulative', 'duedate', 'production', 'delete', 'deleted_at', 'is_postpago', 'invoice_counter', 'enabled', 'phase'];
 
 
     public static function getInvoiceAvailable($company_id){
@@ -75,6 +75,18 @@ class AccountPrepagoBags extends Model
 
     public function checkIsPostpago(){
         return $this->is_postpago;
+    }
+
+    public function getAccountTypeBadgeAttribute()
+    {
+        $color = "success";
+        $name = "PREPAGO";
+        if ($this->is_postpago) {
+            $color = "info";
+            $name = "POSTPAGO";
+        }
+
+        return "<span class='badge badge-$color'>$name</span>";
     }
 
     
