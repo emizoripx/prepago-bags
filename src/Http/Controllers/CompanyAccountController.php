@@ -12,6 +12,7 @@ use EmizorIpx\PrepagoBags\Models\AccountPrepagoBags;
 use EmizorIpx\PrepagoBags\Services\AccountPrepagoBagService;
 use EmizorIpx\PrepagoBags\Services\PurgeCompanyDataService;
 use EmizorIpx\PrepagoBags\Traits\DecodeIdsTrait;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -71,7 +72,7 @@ class CompanyAccountController extends Controller
             // ACTUALIZA LAS CREDENCIALES Y OBTIENE LAS PARAMETRICAS
             $this->credentials_repo
             ->setCredentials($data['client_id'], $data['client_secret'])
-            ->setHost(config('app.host_demo'))
+            ->setHost(config('clientfel.host_demo'))
             ->setCompanyId($company_id)
             ->register()
             ->syncParametrics();
@@ -110,5 +111,89 @@ class CompanyAccountController extends Controller
         }
 
         
+    }
+
+    public function productionUp (Request $request){
+        
+        $data = $request->all();
+
+        try{
+
+            $company_id = $data['company_id'];
+
+            $companyAccount = AccountPrepagoBags::where('company_id', $company_id)->firstOrFail();
+
+            if(!$companyAccount){
+                throw new PrepagoBagsException('La compañia no existe');
+            }
+
+            $this->purgeFeldataService->setCompanyId($company_id);
+
+            // ELIMINA LOS DATOS DE PRUEBA
+            $this->purgeFeldataService
+            ->purgeInvoices()
+            ->purgeSyncProducts()
+            ->purgeSinProducts()
+            ->purgeSectorDocuments()
+            ->purgeActivities()
+            ->purgeCaptions()
+            ->purgeClients();
+
+            // PURGAR DATOS DE EMIZOR5
+            $company = Company::where('id', $company_id)->firstOrFail();
+            \Log::debug('Company......');
+            \Log::debug($company);
+            $company->invoices()->forceDelete();
+            $company->clients()->forceDelete();
+            $company->products()->forceDelete();
+            $company->save();
+
+            // ACTUALIZA LAS CREDENCIALES Y OBTIENE LAS PARAMETRICAS
+            $this->credentials_repo
+            ->setCredentials($data['client_id'], $data['client_secret'])
+            ->setHost(config('app.host_production'))
+            ->setCompanyId($company_id)
+            ->register()
+            ->syncParametrics();
+
+            // PASAR A PRODUCCION
+            $companyAccount->update([
+                'production' => true,
+                'phase' => 'Production',
+                'is_postpago' => $data['account_type'] ? true : false
+            ]);
+
+            // AGREGA UNA BOLSA GRATIS
+            \Log::debug($companyAccount->is_postpago);
+            // if(!$companyAccount->is_postpago){
+            //     \Log::debug('Es Prepago');
+            //     $this->accountPrepagoBagsService->addBagGift($company_id);
+            // }
+
+            $companyAccount->is_postpago ? $companyAccount->resetInvoiceAvailable()->save() :  $this->accountPrepagoBagsService->addBagGift($company_id); 
+
+            $usersToken = $company->tokens;
+            foreach($usersToken as $token){
+                \Log::debug('tokens');
+                \Log::debug($token);
+                $token->token = Str::random(64);
+                $token->save();
+            }
+
+            return response()->json([
+                'success' => true
+            ]);
+
+        } catch(ClientFelException $ex){
+            return response()->json([
+                'success' => false,
+                'msg' => $ex->getMessage()
+            ]);
+        }catch (PrepagoBagsException $e) {
+            return response()->json([
+                'success' => false,
+                'msg' => $e->getMessage()
+            ]);
+        }
     }
 }
