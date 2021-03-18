@@ -77,6 +77,12 @@ class AccountPrepagoBags extends Model
         return $this->is_postpago;
     }
 
+    public function resetInvoiceAvailable(){
+        $this->invoice_number_available = 0;
+
+        return $this;
+    }
+
     public function getAccountTypeBadgeAttribute()
     {
         $color = "success";
