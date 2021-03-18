@@ -19,7 +19,9 @@ class PrepagoBags {
 
             Route::get('prepago_bags/free/{id_bag}', 'PrepagoBagController@getBagFree');
 
-            Route::get('dashboard/clients', 'DashboardController@clientsList');
+            // Route::get('dashboard/clients', 'DashboardController@clientsList');
+
+            // Route::post('company/pilot-up/{company_id}', 'CompanyAccountController@pilotUp');
             
         });
 
