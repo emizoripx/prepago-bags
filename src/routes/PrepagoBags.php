@@ -27,4 +27,17 @@ class PrepagoBags {
 
         
     }
+
+
+    public static function adminRoutes() {
+
+        Route::group(['namespace' => "\EmizorIpx\PrepagoBags\Http\Controllers"], function () {
+            Route::get('dashboard/clients', 'DashboardController@clientsList')->name('dashboard.getClients');
+            Route::post('dashboard/pilot-up', 'CompanyAccountController@pilotUp')->name('dashboard.pilot');
+            Route::post('dashboard/production-up', 'CompanyAccountController@productionUp')->name('dashboard.production');
+            Route::get('dashboard/form-phase-piloto/{company_id}', 'DashboardController@showForm');
+            Route::get('dashboard/form-phase-production/{company_id}', 'DashboardController@showForm2');
+        });
+
+    }
 }
