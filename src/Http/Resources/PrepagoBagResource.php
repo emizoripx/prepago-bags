@@ -2,10 +2,13 @@
 
 namespace EmizorIpx\PrepagoBags\Http\Resources;
 
+use App\Utils\Traits\MakesHash;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PrepagoBagResource extends JsonResource
 {
+
+    use MakesHash;
     /**
      * Transform the resource into an array.
      *
