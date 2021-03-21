@@ -95,5 +95,7 @@ class AccountPrepagoBags extends Model
         return "<span class='badge badge-$color'>$name</span>";
     }
 
-    
+    public static function getCompanyDetail($company_id){
+        return AccountPrepagoBags::where('company_id', $company_id)->firstOrFail();
+    }
 }
