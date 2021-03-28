@@ -4,6 +4,7 @@ namespace EmizorIpx\PrepagoBags\Models;
 
 use Carbon\Carbon;
 use EmizorIpx\PrepagoBags\Exceptions\PrepagoBagsException;
+use EmizorIpx\PrepagoBags\Services\AccountPrepagoBagService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
@@ -96,6 +97,13 @@ class AccountPrepagoBags extends Model
     }
 
     public static function getCompanyDetail($company_id){
-        return AccountPrepagoBags::where('company_id', $company_id)->firstOrFail();
+        $accountDetail = AccountPrepagoBags::where('company_id', $company_id)->first();
+        if(!$accountDetail){
+            \Log::debug('new Account Prepago Bags');
+            $serviceAccount = new AccountPrepagoBagService();
+            $serviceAccount->addBagGift($company_id);
+            $accountDetail = AccountPrepagoBags::where('company_id', $company_id)->first();
+        }
+        return $accountDetail;
     }
 }
