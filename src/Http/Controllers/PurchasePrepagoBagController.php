@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Utils\Traits\MakesHash;
 use EmizorIpx\PaymentQrBcp\Services\BCPService;
 use EmizorIpx\PrepagoBags\Models\PrepagoBag;
+use EmizorIpx\PrepagoBags\Models\PrepagoBagsPayment;
 use Illuminate\Support\Facades\Request;
 
 
@@ -21,11 +22,18 @@ class PurchasePrepagoBagController extends Controller
     public function get(Request $request, $prepago_bag_id)
     {
 
+        $companyId = auth()->user()->company()->id;
+
         $idBagDecode = $this->decodePrimaryKey($prepago_bag_id);
 
         $prepagoBag = PrepagoBag::find($idBagDecode);
+        
+        // create always a register
+        $generatedId = PrepagoBagsPayment::generateId($companyId,$idBagDecode,$prepagoBag->amount);
 
-        $response = $this->bcpService->generate_qr(100, 'BOB', $prepagoBag->amount, 'Compra bolsa prepago');
+        $bag_prepago_name = $prepagoBag->name . " " . $prepagoBag->number_invoices . " facturas";
+
+        $response = $this->bcpService->generate_qr($generatedId, 'BOB', $prepagoBag->amount, $bag_prepago_name );
 
         if ($response->state != '00') {
             return response()->json([
@@ -41,9 +49,4 @@ class PurchasePrepagoBagController extends Controller
 
     }
 
-    public function store(Request $request)
-    {
-        // get notification from payment service done
-        // save payment in hitorical_payments
-    }
 }
