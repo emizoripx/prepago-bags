@@ -77,6 +77,12 @@ class AccountPrepagoBags extends Model
         return $this->is_postpago;
     }
 
+    public function resetInvoiceAvailable(){
+        $this->invoice_number_available = 0;
+
+        return $this;
+    }
+
     public function getAccountTypeBadgeAttribute()
     {
         $color = "success";
@@ -89,5 +95,7 @@ class AccountPrepagoBags extends Model
         return "<span class='badge badge-$color'>$name</span>";
     }
 
-    
+    public static function getCompanyDetail($company_id){
+        return AccountPrepagoBags::where('company_id', $company_id)->firstOrFail();
+    }
 }

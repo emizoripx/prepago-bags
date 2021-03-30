@@ -19,10 +19,25 @@ class PrepagoBags {
 
             Route::get('prepago_bags/free/{id_bag}', 'PrepagoBagController@getBagFree');
 
-            Route::get('dashboard/clients', 'DashboardController@clientsList');
+            // Route::get('dashboard/clients', 'DashboardController@clientsList');
+
+            // Route::post('company/pilot-up/{company_id}', 'CompanyAccountController@pilotUp');
             
         });
 
         
+    }
+
+
+    public static function adminRoutes() {
+
+        Route::group(['namespace' => "\EmizorIpx\PrepagoBags\Http\Controllers"], function () {
+            Route::get('dashboard/clients', 'DashboardController@clientsList')->name('dashboard.getClients');
+            Route::post('dashboard/pilot-up', 'CompanyAccountController@pilotUp')->name('dashboard.pilot');
+            Route::post('dashboard/production-up', 'CompanyAccountController@productionUp')->name('dashboard.production');
+            Route::get('dashboard/form-phase-piloto/{company_id}', 'DashboardController@showForm');
+            Route::get('dashboard/form-phase-production/{company_id}', 'DashboardController@showForm2');
+        });
+
     }
 }

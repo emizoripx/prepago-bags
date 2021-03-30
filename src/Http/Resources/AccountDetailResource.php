@@ -5,7 +5,7 @@ namespace EmizorIpx\PrepagoBags\Http\Resources;
 use App\Utils\Traits\MakesHash;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PrepagoBagResource extends JsonResource
+class AccountDetailResource extends JsonResource
 {
 
     use MakesHash;
@@ -19,12 +19,14 @@ class PrepagoBagResource extends JsonResource
     {
         return [
             "id" => $this->encodePrimaryKey($this->id),
-            "name" => $this->name,
-            "number_invoices" => $this->number_invoices,
-            "frequency" => $this->frequency,
+            "invoice_number_available" => $this->invoice_number_available,
+            "duedate" => strtotime($this->duedate),
             "acumulative" => boolval($this->acumulative),
-            "amount" => (float) $this->amount,
-            "created_at" => strtotime($this->created_at)
+            "production" => boolval($this->production),
+            "is_postpago" => boolval($this->is_postpago),
+            "invoice_counter" => $this->invoice_counter,
+            "enabled" => $this->enabled,
+            "phase" => $this->phase
         ];
     }
 }
