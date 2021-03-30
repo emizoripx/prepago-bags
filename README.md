@@ -1,4 +1,4 @@
-# PREPAGO BAGS PACKAGE v1.2.6
+# PREPAGO BAGS PACKAGE v1.2.7
 
 ## Library to manage prepago-bags in emizor5
 
