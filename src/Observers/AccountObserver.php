@@ -20,6 +20,8 @@ class AccountObserver {
 
     public function updated($company)
     {
-        $this->service->updateAdditionalInformation(request()->input('felData'), $company->id);
+        if (request()->has('felData') && isset(request()->input('felData')['nim']) && request()->input('felData')['nim'] != "" && isset(request()->input('felData')['ruex']) && request()->input('felData')['ruex'] != "" ){
+            $this->service->updateAdditionalInformation(request()->input('felData'), $company->id);
+        }
     }
 }
