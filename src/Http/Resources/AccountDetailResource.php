@@ -26,7 +26,9 @@ class AccountDetailResource extends JsonResource
             "is_postpago" => boolval($this->is_postpago),
             "invoice_counter" => $this->invoice_counter,
             "enabled" => $this->enabled,
-            "phase" => $this->phase
+            "phase" => $this->phase,
+            "ruex" => $this->ruex,
+            "nim" => $this->nim
         ];
     }
 }

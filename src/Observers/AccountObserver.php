@@ -14,10 +14,12 @@ class AccountObserver {
     }
 
     public function created($company){
-        \Log::debug('Bolsa de Regalo');
-        \Log::debug($company);
-        \Log::debug('Bolsa de Regalo company id');
-        \Log::debug($company->id);
+
         $this->service->addBagGift($company->id);
+    }
+
+    public function updated($company)
+    {
+        $this->service->updateAdditionalInformation(request()->input('felData'), $company->id);
     }
 }
