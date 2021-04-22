@@ -94,5 +94,17 @@ class PurgeCompanyDataService {
         }
     }
 
+    public function purgePOS(){
+        try{
+            $affected = DB::delete('delete from fel_pos where company_id = ?', [$this->company_id]);
+
+            \Log::debug($affected.' Registros Afectados: POS');
+
+            return $this;
+        }catch(Exception $ex){
+            throw new PrepagoBagsException('Error al purgar los datos de POS');
+        }
+    }
+
 
 }

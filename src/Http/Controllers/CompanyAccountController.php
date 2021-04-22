@@ -59,7 +59,8 @@ class CompanyAccountController extends Controller
             ->purgeActivities()
             ->purgeCaptions()
             ->purgeClients()
-            ->purgeBranches();
+            ->purgeBranches()
+            ->purgePOS();
 
             // PURGAR DATOS DE EMIZOR5
             $company = Company::where('id', $company_id)->firstOrFail();
@@ -76,7 +77,8 @@ class CompanyAccountController extends Controller
             ->setHost(config('clientfel.host_demo'))
             ->setCompanyId($company_id)
             ->register()
-            ->syncParametrics();
+            ->syncParametrics()
+            ->getBranches();
             
 
             // CAMBIA A PRUEBAS PILOTO
@@ -139,7 +141,8 @@ class CompanyAccountController extends Controller
             ->purgeActivities()
             ->purgeCaptions()
             ->purgeClients()
-            ->purgeBranches();
+            ->purgeBranches()
+            ->purgePOS();
 
             // PURGAR DATOS DE EMIZOR5
             $company = Company::where('id', $company_id)->firstOrFail();
@@ -156,7 +159,8 @@ class CompanyAccountController extends Controller
             ->setHost(config('clientfel.host_production'))
             ->setCompanyId($company_id)
             ->register()
-            ->syncParametrics();
+            ->syncParametrics()
+            ->getBranches();
 
             // PASAR A PRODUCCION
             $companyAccount->update([

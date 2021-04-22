@@ -30,7 +30,7 @@ class AccountPrepagoBags extends Model
     }
 
     public function fel_branches(){
-        return $this->hasMany(FelBranch::class, 'company_id', 'company_id');
+        return $this->hasMany(FelBranch::class, 'company_id', 'company_id')->with('fel_pos');
     }
 
     
