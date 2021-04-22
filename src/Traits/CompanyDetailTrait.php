@@ -14,7 +14,7 @@ trait CompanyDetailTrait{
     public function includeCompanyDetail(){
 
         $company = $this->company_detail->load('fel_branches');
-        
+
         return  new AccountDetailResource(collect($company));
     }
 }
