@@ -3,6 +3,7 @@
 namespace EmizorIpx\PrepagoBags\Models;
 
 use Carbon\Carbon;
+use EmizorIpx\ClientFel\Models\FelBranch;
 use EmizorIpx\PrepagoBags\Exceptions\PrepagoBagsException;
 use EmizorIpx\PrepagoBags\Services\AccountPrepagoBagService;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +26,10 @@ class AccountPrepagoBags extends Model
             return $account->invoice_number_available;
         }
         
+    }
+
+    public function fel_branches(){
+        return $this->hasMany(FelBranch::class, 'company_id', 'company_id');
     }
 
     
