@@ -82,5 +82,17 @@ class PurgeCompanyDataService {
         }
     }
 
+    public function purgeBranches(){
+        try{
+            $affected = DB::delete('delete from fel_branches where company_id = ?', [$this->company_id]);
+
+            \Log::debug($affected.' Registros Afectados: Sucursales');
+
+            return $this;
+        }catch(Exception $ex){
+            throw new PrepagoBagsException('Error al purgar los datos de sucursal');
+        }
+    }
+
 
 }

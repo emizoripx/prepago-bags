@@ -12,8 +12,9 @@ trait CompanyDetailTrait{
     }
 
     public function includeCompanyDetail(){
-        $company_detail = $this->company_detail;
 
-        return is_null($company_detail) ? null : new AccountDetailResource($company_detail);
+        $company = $this->company_detail->load('fel_branches');
+        
+        return  new AccountDetailResource(collect($company));
     }
 }

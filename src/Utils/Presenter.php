@@ -18,7 +18,7 @@ class Presenter {
         Log::debug('AppendBags');
         Log::debug($company_id);
         $data['fel_data']['bags'] = PrepagoBagResource::collection( PrepagoBag::getAllBags($company_id) );
-        $data['fel_data']['company_detail'] = new AccountDetailResource(AccountPrepagoBags::getCompanyDetail($company_id));
+        // $data['fel_data']['company_detail'] = new AccountDetailResource(AccountPrepagoBags::getCompanyDetail($company_id));
         $data['fel_data']['purchase_history'] = PurchaseHistoryResource::collection(PrepagoBagsPurchaseHistorial::getPurchaseHistorial($company_id));
         return $data;
     }
