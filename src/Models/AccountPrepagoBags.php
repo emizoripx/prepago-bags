@@ -5,7 +5,6 @@ namespace EmizorIpx\PrepagoBags\Models;
 use Carbon\Carbon;
 use EmizorIpx\PrepagoBags\Exceptions\PrepagoBagsException;
 use EmizorIpx\PrepagoBags\Services\AccountPrepagoBagService;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
@@ -62,15 +61,13 @@ class AccountPrepagoBags extends Model
 
     public function addNumberInvoice(){
         $this->invoice_number_available = $this->invoice_number_available + 1;
-        \Log::debug('Sumar numero de Factura');
-        \Log::debug($this->invoice_number_available);
+        \Log::debug("#Facturas disponibles :" . $this->invoice_number_available);
         return $this;
     }
 
     public function reduceNumberInvoice(){
         $this->invoice_number_available = $this->invoice_number_available - 1;
-        \Log::debug('Restar numero de Factura');
-        \Log::debug($this->invoice_number_available);
+        \Log::debug("#Facturas disponibles :" .$this->invoice_number_available);
         return $this;
     }
 
@@ -99,7 +96,6 @@ class AccountPrepagoBags extends Model
     public static function getCompanyDetail($company_id){
         $accountDetail = AccountPrepagoBags::where('company_id', $company_id)->first();
         if(!$accountDetail){
-            \Log::debug('new Account Prepago Bags');
             $serviceAccount = new AccountPrepagoBagService();
             $serviceAccount->addBagGift($company_id);
             $accountDetail = AccountPrepagoBags::where('company_id', $company_id)->first();
