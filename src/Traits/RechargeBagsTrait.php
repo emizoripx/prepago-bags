@@ -28,7 +28,8 @@ trait RechargeBagsTrait {
                 'company_id' => $company_id,
                 'invoice_number_available' => $account_repo->updateInvoicesAvailable($number_invoice_before, $bag),
                 'acumulative' => $bag->acumulative,
-                'duedate' => $account_repo->setDueDate($bag)
+                'duedate' => $account_repo->setDueDate($bag),
+                'sector_document_type_code' => $bag->sector_document_type_code
             ]);
             
             Log::debug($accountDetails);

@@ -15,6 +15,7 @@ class AccountObserver {
 
     public function created($company){
 
+        $this->service->registerAccountPrepagoBags($company->id);
         $this->service->addBagGift($company->id);
     }
 

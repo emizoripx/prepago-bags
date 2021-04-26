@@ -14,7 +14,7 @@ class PrepagoBag extends Model
 
     protected $table = 'prepago_bags';
 
-    protected $fillable = ['number_invoices', 'name','frequency', 'acumulative', 'amount'];
+    protected $fillable = ['number_invoices', 'name','frequency', 'acumulative', 'amount','sector_document_type_code'];
 
 
     public static function getAllBags($company_id){

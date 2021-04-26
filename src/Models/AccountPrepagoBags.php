@@ -13,7 +13,7 @@ class AccountPrepagoBags extends Model
 {
     protected $table = 'account_prepago_bags';
 
-    protected $fillable = ['company_id', 'invoice_number_available', 'acumulative', 'duedate', 'production', 'delete', 'deleted_at', 'is_postpago', 'invoice_counter', 'enabled', 'phase'];
+    protected $fillable = ['company_id', 'invoice_number_available', 'acumulative', 'duedate', 'production', 'delete', 'deleted_at', 'is_postpago', 'invoice_counter', 'enabled', 'phase','sector_document_type_code'];
 
 
     public static function getInvoiceAvailable($company_id){

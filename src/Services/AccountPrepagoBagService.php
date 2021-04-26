@@ -3,6 +3,8 @@
 namespace EmizorIpx\PrepagoBags\Services;
 
 use Carbon\Carbon;
+use EmizorIpx\ClientFel\Models\FelParametric;
+use EmizorIpx\ClientFel\Utils\TypeParametrics;
 use EmizorIpx\PrepagoBags\Exceptions\PrepagoBagsException;
 use EmizorIpx\PrepagoBags\Models\AccountPrepagoBags;
 use EmizorIpx\PrepagoBags\Models\PrepagoBag;
@@ -15,13 +17,14 @@ class AccountPrepagoBagService {
 
     use RechargeBagsTrait;
 
-    public function controlPrepagoBag($company_id){
+    
+    public function controlPrepagoBag($company_id, $sector_document_type_code){
 
         $hashid = new Hashids(config('ninja.hash_salt'), 10);
 
         $company_id = $hashid->decode($company_id);
 
-        $accountDetail = AccountPrepagoBags::where('company_id', $company_id)->where('is_postpago', false)->first();
+        $accountDetail = AccountPrepagoBags::where('company_id', $company_id)->where('is_postpago', false)->where('sector_document_type_code', $sector_document_type_code)->first();
 
         if (! empty($accountDetail)) {
 
@@ -70,6 +73,23 @@ class AccountPrepagoBagService {
             $accountDetail->save();
         }
             
+    }
+
+    public function registerAccountPrepagoBags($company_id){
+        
+        try {
+            $documents = FelParametric::index(TypeParametrics::TIPOS_DOCUMENTO_SECTOR, $company_id);
+
+            foreach( $documents as $document ){
+                AccountPrepagoBags::createOrUpdate([
+                    'company_id' => $company_id,
+                    'sector_document_type_code' => $document->codigo
+                ]);
+            }
+        } catch (Exception $ex) {
+            bitacora_error('AccountPrepagoBagService:addAccount', $ex->getMessage());
+        }
+        
     }
 
 
