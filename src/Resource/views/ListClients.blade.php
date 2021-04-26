@@ -22,7 +22,7 @@
                     <th width="5%">#</th>
                     <th width="10%">Compañia</th>
                     <th width="20%">Dueño</th>
-                    <th width="15%">Cant disponible facturas</th>
+                    {{-- <th width="15%">Cant disponible facturas</th> --}}
                     <th width="10%">Producción</th>
                     <th width="10%">Tipo de Cuenta</th>
                     <th width="10%">Fase</th>
@@ -35,7 +35,7 @@
                         <td>{{ $client->id }}</td>
                         <td>{{ json_decode($client->settings)->name }}</td>
                         <td>{{ $client->email }}</td>
-                        <td>{{ $client->invoice_number_available }}</td>
+                        {{-- <td>{{ $client->invoice_number_available }}</td> --}}
 
                         <td align="center">{{ $client->production ? "Sí" : "No" }}</td>
                         <td align="center">{!! $client->account_type_badge !!}</td>

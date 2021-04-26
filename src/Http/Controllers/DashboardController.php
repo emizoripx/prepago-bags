@@ -10,11 +10,11 @@ class DashboardController extends Controller
     public function clientsList(){
         
      
-        $clientsPrepago = AccountPrepagoBags::join('company_user', 'company_user.company_id','=','account_prepago_bags.company_id')
-                                            ->join('companies', 'account_prepago_bags.company_id', '=', 'companies.id')
+        $clientsPrepago = AccountPrepagoBags::join('company_user', 'company_user.company_id','=','fel_company.company_id')
+                                            ->join('companies', 'fel_company.company_id', '=', 'companies.id')
                                             ->Join('users','users.id','=','company_user.user_id')
-                    ->select('companies.id','account_prepago_bags.company_id' ,'companies.settings' ,'account_prepago_bags.invoice_number_available','account_prepago_bags.production', 'account_prepago_bags.is_postpago', 'account_prepago_bags.enabled', 'account_prepago_bags.phase','users.email')
-                    ->where('account_prepago_bags.delete', '=', false)
+                    ->select('companies.id','fel_company.company_id' ,'companies.settings' ,'fel_company.production', 'fel_company.is_postpago', 'fel_company.enabled', 'fel_company.phase','users.email')
+                    ->where('fel_company.deleted_at', '=', null)
                     ->where('company_user.is_owner', 1)
                     ->orderBy('companies.id','desc')
                     ->simplePaginate(30);
@@ -27,13 +27,13 @@ class DashboardController extends Controller
 
     public function showForm($companyid)
     {
-        $data = AccountPrepagoBags::join('companies', 'account_prepago_bags.company_id', '=', 'companies.id')
+        $data = AccountPrepagoBags::join('companies', 'fel_company.company_id', '=', 'companies.id')
                             ->select(
                                 'companies.id', 
-                                'account_prepago_bags.company_id', 
+                                'fel_company.company_id', 
                                 'companies.settings'
                                 )
-                            ->where('account_prepago_bags.delete', '=', false)
+                            ->where('fel_company.deleted_at', '=', null)
                             ->where('companies.id',$companyid)
                             ->first();
 
@@ -41,13 +41,13 @@ class DashboardController extends Controller
     }
     public function showForm2($companyid)
     {
-        $data = AccountPrepagoBags::join('companies', 'account_prepago_bags.company_id', '=', 'companies.id')
+        $data = AccountPrepagoBags::join('companies', 'fel_company.company_id', '=', 'companies.id')
                             ->select(
                                 'companies.id', 
-                                'account_prepago_bags.company_id', 
+                                'fel_company.company_id', 
                                 'companies.settings'
                                 )
-                            ->where('account_prepago_bags.delete', '=', false)
+                            ->where('fel_company.deleted_at', '=', null)
                             ->where('companies.id',$companyid)
                             ->first();
 
