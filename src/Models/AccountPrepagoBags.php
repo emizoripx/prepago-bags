@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 class AccountPrepagoBags extends Model
 {
-    protected $table = 'account_prepago_bags';
+    protected $table = 'fel_company';
 
     protected $fillable = ['company_id', 'invoice_number_available', 'acumulative', 'duedate', 'production', 'delete', 'deleted_at', 'is_postpago', 'invoice_counter', 'enabled', 'phase','sector_document_type_code'];
 
