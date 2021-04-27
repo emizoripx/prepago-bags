@@ -6,14 +6,18 @@ use Carbon\Carbon;
 use EmizorIpx\ClientFel\Models\FelBranch;
 use EmizorIpx\PrepagoBags\Exceptions\PrepagoBagsException;
 use EmizorIpx\PrepagoBags\Services\AccountPrepagoBagService;
+use EmizorIpx\PrepagoBags\Traits\RechargeBagsTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class AccountPrepagoBags extends Model
 {
+
+    use RechargeBagsTrait;
+
     protected $table = 'fel_company';
 
-    protected $fillable = ['company_id', 'invoice_number_available', 'acumulative', 'duedate', 'production', 'delete', 'deleted_at', 'is_postpago', 'invoice_counter', 'enabled', 'phase','sector_document_type_code'];
+    protected $fillable = ['company_id', 'production', 'deleted_at', 'is_postpago', 'enabled', 'phase','ruex','nim'];
 
 
     public static function getInvoiceAvailable($company_id){
@@ -30,6 +34,14 @@ class AccountPrepagoBags extends Model
 
     public function fel_branches(){
         return $this->hasMany(FelBranch::class, 'company_id', 'company_id')->with('fel_pos');
+    }
+
+    public function fel_company_document_sector(){
+        return $this->hasMany(FelCompanyDocumentSector::class, 'fel_company_id', 'id');
+    }
+
+    public function service(){
+        return new AccountPrepagoBagService($this);
     }
 
     
