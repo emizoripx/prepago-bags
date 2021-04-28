@@ -143,9 +143,10 @@ class PrepagoBagController extends Controller
                 throw new Exception("Ya Adquirió esta bolsa Gratis anteriormente");
             }
 
-            $bagService = new AccountPrepagoBagService();
+            // $bagService = new AccountPrepagoBagService(auth()->user()->getCompany()->company_detail->service());
 
-            $bagService->addBagFree(auth()->user()->getCompany()->id, $idBagDecode);
+            // $bagService->addBagFree($idBagDecode);
+            auth()->user()->getCompany()->company_detail->service()->addBagFree($idBagDecode);
 
             return response()->json([
                 'success' => true
