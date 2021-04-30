@@ -78,6 +78,7 @@ class CompanyAccountController extends Controller
             ->setHost(config('clientfel.host_demo'))
             ->setCompanyId($company_id)
             ->register()
+            ->updateFelCompany()
             ->syncParametrics()
             ->getBranches();
             
@@ -163,6 +164,7 @@ class CompanyAccountController extends Controller
             ->setHost(config('clientfel.host_production'))
             ->setCompanyId($company_id)
             ->register()
+            ->updateFelCompany()
             ->syncParametrics()
             ->getBranches();
 
