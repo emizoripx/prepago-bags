@@ -17,7 +17,7 @@ class AccountPrepagoBags extends Model
 
     protected $table = 'fel_company';
 
-    protected $fillable = ['company_id', 'production', 'deleted_at', 'is_postpago', 'enabled', 'phase','ruex','nim'];
+    protected $fillable = ['company_id', 'production', 'deleted_at', 'is_postpago', 'enabled', 'phase','ruex','nim','fel_company_id'];
 
 
     public static function getInvoiceAvailable($company_id){
