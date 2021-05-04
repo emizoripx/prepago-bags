@@ -3,9 +3,10 @@
 namespace EmizorIpx\PrepagoBags\Http\Resources;
 
 use App\Utils\Traits\MakesHash;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use EmizorIpx\ClientFel\Http\Resources\BranchResource;
 
-class AccountDetailResource extends JsonResource
+class AccountDetailResource extends ResourceCollection
 {
 
     use MakesHash;
@@ -17,16 +18,17 @@ class AccountDetailResource extends JsonResource
      */
     public function toArray($request)
     {
+
         return [
-            "id" => $this->encodePrimaryKey($this->id),
-            "invoice_number_available" => $this->invoice_number_available,
-            "duedate" => strtotime($this->duedate),
-            "acumulative" => boolval($this->acumulative),
-            "production" => boolval($this->production),
-            "is_postpago" => boolval($this->is_postpago),
-            "invoice_counter" => $this->invoice_counter,
-            "enabled" => $this->enabled,
-            "phase" => $this->phase
+            "id" => $this->encodePrimaryKey($this->resource['id']),
+            "production" => boolval($this->resource['production']),
+            "is_postpago" => boolval($this->resource['is_postpago']),
+            "enabled" => $this->resource['enabled'],
+            "phase" => $this->resource['phase'],
+            "ruex" => $this->resource['ruex'],
+            "nim" => $this->resource['nim'],
+            "branches" => BranchResource::collection($this->resource['fel_branches']),
+            "document_sector_detail" => CompanyDocumentSectorResource::collection($this->resource['fel_company_document_sector'])
         ];
     }
 }

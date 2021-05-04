@@ -42,7 +42,7 @@ class PrepagoBagsServiceProvider extends ServiceProvider
         // // Obeservers
         
         // $account = $this->app->make(Config::get('prepagobag.entity_table_account'));
-        Company::observe(new AccountObserver(new AccountPrepagoBagService));
+        // Company::observe(new AccountObserver(new AccountPrepagoBagService));
 
 
         // VISTAS

@@ -82,5 +82,53 @@ class PurgeCompanyDataService {
         }
     }
 
+    public function purgeBranches(){
+        try{
+            $affected = DB::delete('delete from fel_branches where company_id = ?', [$this->company_id]);
+
+            \Log::debug($affected.' Registros Afectados: Sucursales');
+
+            return $this;
+        }catch(Exception $ex){
+            throw new PrepagoBagsException('Error al purgar los datos de sucursal');
+        }
+    }
+
+    public function purgePOS(){
+        try{
+            $affected = DB::delete('delete from fel_pos where company_id = ?', [$this->company_id]);
+
+            \Log::debug($affected.' Registros Afectados: POS');
+
+            return $this;
+        }catch(Exception $ex){
+            throw new PrepagoBagsException('Error al purgar los datos de POS');
+        }
+    }
+    public function purgeCompanyDocumentSector(){
+        try{
+            $affected = DB::delete('delete from fel_company_document_sectors where company_id = ?', [$this->company_id]);
+
+            \Log::debug($affected.' Registros Afectados: CompanyDocumentSectors');
+
+            return $this;
+        }catch(Exception $ex){
+            throw new PrepagoBagsException('Error al purgar los datos de CompanyDocumentSectors');
+        }
+    }
+    public function resetCompanyDocumentSector(){
+        try{
+            $affected = DB::table('fel_company_document_sectors')->where('company_id', $this->company_id)->update([
+                'invoice_number_available' => 0
+            ]);
+
+            \Log::debug($affected.' Registros Afectados: CompanyDocumentSectors');
+
+            return $this;
+        }catch(Exception $ex){
+            throw new PrepagoBagsException('Error al purgar los datos de CompanyDocumentSectors');
+        }
+    }
+
 
 }

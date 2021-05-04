@@ -24,7 +24,8 @@ class PrepagoBagResource extends JsonResource
             "frequency" => $this->frequency,
             "acumulative" => boolval($this->acumulative),
             "amount" => (float) $this->amount,
-            "created_at" => strtotime($this->created_at)
+            "created_at" => strtotime($this->created_at),
+            "sector_document_type_code" => $this->sector_document_type_code
         ];
     }
 }

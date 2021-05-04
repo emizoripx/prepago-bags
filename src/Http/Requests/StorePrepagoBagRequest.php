@@ -38,7 +38,8 @@ class StorePrepagoBagRequest extends FormRequest
                 'required',
                 'bool',
                 new CheckAcumulativeBag(request()->amount)
-            ]
+            ],
+            'sector_document_type_code' => 'nullable|integer'
         ];
     }
 

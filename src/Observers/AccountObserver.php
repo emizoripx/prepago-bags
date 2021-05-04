@@ -14,10 +14,15 @@ class AccountObserver {
     }
 
     public function created($company){
-        \Log::debug('Bolsa de Regalo');
-        \Log::debug($company);
-        \Log::debug('Bolsa de Regalo company id');
-        \Log::debug($company->id);
+
+        $this->service->registerAccountPrepagoBags($company->id);
         $this->service->addBagGift($company->id);
+    }
+
+    public function updated($company)
+    {
+        if (request()->has('felData') && isset(request()->input('felData')['nim']) && request()->input('felData')['nim'] != "" && isset(request()->input('felData')['ruex']) && request()->input('felData')['ruex'] != "" ){
+            $this->service->updateAdditionalInformation(request()->input('felData'), $company->id);
+        }
     }
 }

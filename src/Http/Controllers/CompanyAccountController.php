@@ -27,13 +27,13 @@ class CompanyAccountController extends Controller
 
     protected $purgeFeldataService;
     protected $credentials_repo;
-    protected $accountPrepagoBagsService;
+    // protected $accountPrepagoBagsService;
     
-    public function __construct(PurgeCompanyDataService $purgeFeldataService, FelCredentialRepository $credentials_repo, AccountPrepagoBagService $accountPrepagoBagService)
+    public function __construct(PurgeCompanyDataService $purgeFeldataService, FelCredentialRepository $credentials_repo)
     {
         $this->purgeFeldataService = $purgeFeldataService;
         $this->credentials_repo = $credentials_repo;
-        $this->accountPrepagoBagsService = $accountPrepagoBagService;
+        // $this->accountPrepagoBagsService = $accountPrepagoBagService;
     }
 
     public function pilotUp(Request $request){
@@ -58,7 +58,10 @@ class CompanyAccountController extends Controller
             ->purgeSectorDocuments()
             ->purgeActivities()
             ->purgeCaptions()
-            ->purgeClients();
+            ->purgeClients()
+            ->purgeBranches()
+            ->purgePOS()
+            ->purgeCompanyDocumentSector();
 
             // PURGAR DATOS DE EMIZOR5
             $company = Company::where('id', $company_id)->firstOrFail();
@@ -75,7 +78,9 @@ class CompanyAccountController extends Controller
             ->setHost(config('clientfel.host_demo'))
             ->setCompanyId($company_id)
             ->register()
-            ->syncParametrics();
+            ->updateFelCompany()
+            ->syncParametrics()
+            ->getBranches();
             
 
             // CAMBIA A PRUEBAS PILOTO
@@ -84,7 +89,9 @@ class CompanyAccountController extends Controller
             ]);
 
             // AGREGA UNA BOLSA GRATIS
-            $this->accountPrepagoBagsService->addBagGift($company_id);
+            // $this->accountPrepagoBagsService->addBagGift($company_id); //Modificar
+
+            $company->company_detail->service()->registerCompanySectorDocuments()->addBagGift();
 
             $usersToken = $company->tokens;
             foreach($usersToken as $token){
@@ -137,7 +144,10 @@ class CompanyAccountController extends Controller
             ->purgeSectorDocuments()
             ->purgeActivities()
             ->purgeCaptions()
-            ->purgeClients();
+            ->purgeClients()
+            ->purgeBranches()
+            ->purgePOS()
+            ->purgeSectorDocuments();
 
             // PURGAR DATOS DE EMIZOR5
             $company = Company::where('id', $company_id)->firstOrFail();
@@ -154,7 +164,9 @@ class CompanyAccountController extends Controller
             ->setHost(config('clientfel.host_production'))
             ->setCompanyId($company_id)
             ->register()
-            ->syncParametrics();
+            ->updateFelCompany()
+            ->syncParametrics()
+            ->getBranches();
 
             // PASAR A PRODUCCION
             $companyAccount->update([
@@ -170,7 +182,7 @@ class CompanyAccountController extends Controller
             //     $this->accountPrepagoBagsService->addBagGift($company_id);
             // }
 
-            $companyAccount->is_postpago ? $companyAccount->resetInvoiceAvailable()->save() :  $this->accountPrepagoBagsService->addBagGift($company_id); 
+            $companyAccount->is_postpago ? $companyAccount->resetInvoiceAvailable()->save() :  $company->company_detail->service()->registerCompanySectorDocuments()->addBagGift();; 
 
             $usersToken = $company->tokens;
             foreach($usersToken as $token){

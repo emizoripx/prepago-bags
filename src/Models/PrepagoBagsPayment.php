@@ -13,17 +13,17 @@ class PrepagoBagsPayment extends Model
     protected $guarded = [];
 
 
-    protected static function boot()
-    {
-        parent::boot();
-        static::created(function ($query) {
-            // remove unused qr payment register 
-            \DB::table('prepago_bags_payments')
-            ->whereNull('paid_on')
-            ->whereRaw(" updated_at < now() - interval 2 DAY")
-            ->delete();
-        });
-    }
+    // protected static function boot()
+    // {
+    //     parent::boot();
+    //     static::created(function ($query) {
+    //         // remove unused qr payment register 
+    //         \DB::table('prepago_bags_payments')
+    //         ->whereNull('paid_on')
+    //         ->whereRaw(" updated_at < now() - interval 2 DAY")
+    //         ->delete();
+    //     });
+    // }
 
 
     public static function generateId($companyId,$prepagoBagId, $amount) 

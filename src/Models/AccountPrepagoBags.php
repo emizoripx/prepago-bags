@@ -3,16 +3,21 @@
 namespace EmizorIpx\PrepagoBags\Models;
 
 use Carbon\Carbon;
+use EmizorIpx\ClientFel\Models\FelBranch;
 use EmizorIpx\PrepagoBags\Exceptions\PrepagoBagsException;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use EmizorIpx\PrepagoBags\Services\AccountPrepagoBagService;
+use EmizorIpx\PrepagoBags\Traits\RechargeBagsTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class AccountPrepagoBags extends Model
 {
-    protected $table = 'account_prepago_bags';
 
-    protected $fillable = ['company_id', 'invoice_number_available', 'acumulative', 'duedate', 'production', 'delete', 'deleted_at', 'is_postpago', 'invoice_counter', 'enabled', 'phase'];
+    use RechargeBagsTrait;
+
+    protected $table = 'fel_company';
+
+    protected $fillable = ['company_id', 'production', 'deleted_at', 'is_postpago', 'enabled', 'phase','ruex','nim','fel_company_id'];
 
 
     public static function getInvoiceAvailable($company_id){
@@ -25,6 +30,18 @@ class AccountPrepagoBags extends Model
             return $account->invoice_number_available;
         }
         
+    }
+
+    public function fel_branches(){
+        return $this->hasMany(FelBranch::class, 'company_id', 'company_id')->with('fel_pos');
+    }
+
+    public function fel_company_document_sector(){
+        return $this->hasMany(FelCompanyDocumentSector::class, 'fel_company_id', 'id');
+    }
+
+    public function service(){
+        return new AccountPrepagoBagService($this);
     }
 
     
@@ -54,22 +71,20 @@ class AccountPrepagoBags extends Model
 
     public function checkInvoiceAvailable(){
         if($this->invoice_number_available <=  0){
-            throw new PrepagoBagsException("Facturas no diponibles para emitir. Adquirir un nuevo plan.");
+            throw new PrepagoBagsException("Facturas no diponibles para emitir. Adquirir una nueva bolsa.");
         }
     }
 
 
     public function addNumberInvoice(){
         $this->invoice_number_available = $this->invoice_number_available + 1;
-        \Log::debug('Sumar numero de Factura');
-        \Log::debug($this->invoice_number_available);
+        \Log::debug("#Facturas disponibles :" . $this->invoice_number_available);
         return $this;
     }
 
     public function reduceNumberInvoice(){
         $this->invoice_number_available = $this->invoice_number_available - 1;
-        \Log::debug('Restar numero de Factura');
-        \Log::debug($this->invoice_number_available);
+        \Log::debug("#Facturas disponibles :" .$this->invoice_number_available);
         return $this;
     }
 
@@ -96,6 +111,12 @@ class AccountPrepagoBags extends Model
     }
 
     public static function getCompanyDetail($company_id){
-        return AccountPrepagoBags::where('company_id', $company_id)->firstOrFail();
+        $accountDetail = AccountPrepagoBags::where('company_id', $company_id)->first();
+        if(!$accountDetail){
+            $serviceAccount = new AccountPrepagoBagService();
+            $serviceAccount->addBagGift($company_id);
+            $accountDetail = AccountPrepagoBags::where('company_id', $company_id)->first();
+        }
+        return $accountDetail;
     }
 }
