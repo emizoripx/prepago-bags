@@ -27,6 +27,7 @@ class AccountDetailResource extends ResourceCollection
             "phase" => $this->resource['phase'],
             "ruex" => $this->resource['ruex'],
             "nim" => $this->resource['nim'],
+            "settings_integration" => json_decode($this->resource['settings']),
             "branches" => BranchResource::collection($this->resource['fel_branches']),
             "document_sector_detail" => CompanyDocumentSectorResource::collection($this->resource['fel_company_document_sector'])
         ];

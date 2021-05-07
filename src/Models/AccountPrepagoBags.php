@@ -19,6 +19,9 @@ class AccountPrepagoBags extends Model
 
     protected $fillable = ['company_id', 'production', 'deleted_at', 'is_postpago', 'enabled', 'phase','ruex','nim','fel_company_id'];
 
+    protected $casts = [
+        'settings' => 'string'
+    ];
 
     public static function getInvoiceAvailable($company_id){
         $account = self::where('company_id', $company_id)->first();
