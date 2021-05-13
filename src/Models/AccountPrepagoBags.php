@@ -4,6 +4,7 @@ namespace EmizorIpx\PrepagoBags\Models;
 
 use Carbon\Carbon;
 use EmizorIpx\ClientFel\Models\FelBranch;
+use EmizorIpx\ClientFel\Models\FelClientToken;
 use EmizorIpx\PrepagoBags\Exceptions\PrepagoBagsException;
 use EmizorIpx\PrepagoBags\Services\AccountPrepagoBagService;
 use EmizorIpx\PrepagoBags\Traits\RechargeBagsTrait;
@@ -47,7 +48,9 @@ class AccountPrepagoBags extends Model
         return new AccountPrepagoBagService($this);
     }
 
-    
+    public function fel_company_token(){
+        return $this->hasOne(FelClientToken::class, 'account_id', 'company_id');
+    }
     
     public static function createOrUpdate($data){
         $account = self::where('company_id', $data['company_id'])->first();
