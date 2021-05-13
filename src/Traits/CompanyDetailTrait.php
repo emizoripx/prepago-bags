@@ -9,7 +9,7 @@ use Carbon\Carbon;
 trait CompanyDetailTrait{
 
     public function company_detail(){
-        return $this->hasOne(AccountPrepagoBags::class, 'company_id')->with('fel_branches','fel_company_document_sector');
+        return $this->hasOne(AccountPrepagoBags::class, 'company_id')->with('fel_branches','fel_company_document_sector', 'fel_company_token');
     }
 
     public function includeCompanyDetail(){
