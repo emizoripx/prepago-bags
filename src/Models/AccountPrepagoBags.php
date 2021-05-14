@@ -125,4 +125,15 @@ class AccountPrepagoBags extends Model
         }
         return $accountDetail;
     }
+
+
+    public function updateAdditionalInformation($feldata)
+    {
+
+        $this->ruex = !empty($feldata['ruex']) ? $feldata['ruex'] : "";
+        
+        $this->nim = !empty($feldata['nim']) ? $feldata['nim'] : "";
+            
+        return $this;
+    }
 }

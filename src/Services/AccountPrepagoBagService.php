@@ -73,19 +73,6 @@ class AccountPrepagoBagService {
         $this->fel_company->rechargePrepagoBags($bag_id);
     }
 
-    public function updateAdditionalInformation($feldata, $company_id)
-    {
-
-        $accountDetail = AccountPrepagoBags::where('company_id', $company_id)->first();
-
-        if (!empty($accountDetail)) {
-            //these fields were added for exportation companies
-            $accountDetail->ruex = !empty($feldata['ruex']) ? $feldata['ruex'] : "";
-            $accountDetail->nim = !empty($feldata['nim']) ? $feldata['nim'] : "" ;
-            $accountDetail->save();
-        }
-            
-    }
 
     public function registerCompanySectorDocuments(){
         

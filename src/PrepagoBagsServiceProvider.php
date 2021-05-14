@@ -39,10 +39,10 @@ class PrepagoBagsServiceProvider extends ServiceProvider
 
         $this->mergeConfigFrom(__DIR__.'/config/prepagobag.php', 'prepagobag');
 
-        // // Obeservers
-        
-        // $account = $this->app->make(Config::get('prepagobag.entity_table_account'));
-        // Company::observe(new AccountObserver(new AccountPrepagoBagService));
+        // Obeservers only for update
+            
+        $account = $this->app->make(Config::get('prepagobag.entity_table_account'));
+        Company::observe(new AccountObserver);
 
 
         // VISTAS
