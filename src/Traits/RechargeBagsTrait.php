@@ -44,6 +44,7 @@ trait RechargeBagsTrait {
 
             
         } catch (Exception $ex) {
+            \Log::error("Error  recharge PrepagoBags: " . $ex->getMessage());
             return  $ex->getMessage();
         }
 

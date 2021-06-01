@@ -37,4 +37,9 @@ class PrepagoBagsPayment extends Model
 
         return $new_generated->id;
     }
+
+    public function company()
+    {
+        return $this->hasOne(AccountPrepagoBags::class,"id","company_id"); 
+    }
 }
