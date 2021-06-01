@@ -130,5 +130,17 @@ class PurgeCompanyDataService {
         }
     }
 
+    public function purgeActivityDocumentSector(){
+        try{
+            $affected = DB::delete('delete from fel_activity_document_sector where company_id = ?', [$this->company_id]);
+
+            \Log::debug($affected.' Registros Afectados: ActivityDocumentSectors');
+
+            return $this;
+        }catch(Exception $ex){
+            throw new PrepagoBagsException('Error al purgar los datos de ActivityDocumentSectors');
+        }
+    }
+
 
 }
