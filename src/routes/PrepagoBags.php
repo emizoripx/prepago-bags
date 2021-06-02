@@ -2,7 +2,9 @@
 
 namespace EmizorIpx\PrepagoBags\routes;
 
+use EmizorIpx\PrepagoBags\Models\FelPin;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 class PrepagoBags {
 
@@ -37,6 +39,7 @@ class PrepagoBags {
             Route::post('dashboard/production-up', 'CompanyAccountController@productionUp')->name('dashboard.production');
             Route::get('dashboard/form-phase-piloto/{company_id}', 'DashboardController@showForm');
             Route::get('dashboard/form-phase-production/{company_id}', 'DashboardController@showForm2');
+            
         });
 
     }

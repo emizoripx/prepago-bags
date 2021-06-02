@@ -61,7 +61,8 @@ class CompanyAccountController extends Controller
             ->purgeClients()
             ->purgeBranches()
             ->purgePOS()
-            ->purgeCompanyDocumentSector();
+            ->purgeCompanyDocumentSector()
+            ->purgeActivityDocumentSector();
 
             // PURGAR DATOS DE EMIZOR5
             $company = Company::where('id', $company_id)->firstOrFail();
@@ -147,7 +148,8 @@ class CompanyAccountController extends Controller
             ->purgeClients()
             ->purgeBranches()
             ->purgePOS()
-            ->purgeSectorDocuments();
+            ->purgeSectorDocuments()
+            ->purgeActivityDocumentSector();
 
             // PURGAR DATOS DE EMIZOR5
             $company = Company::where('id', $company_id)->firstOrFail();
