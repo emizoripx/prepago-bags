@@ -73,6 +73,9 @@ class CompanyAccountController extends Controller
             $company->products()->forceDelete();
             $company->save();
 
+            // RESET COUNTERS
+            $this->purgeFeldataService->resetNumbersCounter($company);
+
             // ACTUALIZA LAS CREDENCIALES Y OBTIENE LAS PARAMETRICAS
             $this->credentials_repo
             ->setCredentials($data['client_id'], $data['client_secret'])
@@ -159,6 +162,9 @@ class CompanyAccountController extends Controller
             $company->clients()->forceDelete();
             $company->products()->forceDelete();
             $company->save();
+
+            // RESET COUNTERS
+            $this->purgeFeldataService->resetNumbersCounter($company);
 
             // ACTUALIZA LAS CREDENCIALES Y OBTIENE LAS PARAMETRICAS
             $this->credentials_repo
