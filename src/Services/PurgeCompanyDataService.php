@@ -2,6 +2,7 @@
 
 namespace EmizorIpx\PrepagoBags\Services;
 
+use App\Models\Company;
 use EmizorIpx\PrepagoBags\Exceptions\PrepagoBagsException;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -140,6 +141,27 @@ class PurgeCompanyDataService {
         }catch(Exception $ex){
             throw new PrepagoBagsException('Error al purgar los datos de ActivityDocumentSectors');
         }
+    }
+
+    public function resetNumbersCounter(Company $company){
+        $settings = $company->settings;
+        // $settings->reset_counter_date = $reset_date->format('Y-m-d');
+        $settings->invoice_number_counter = 1;
+        $settings->quote_number_counter = 1;
+        $settings->credit_number_counter = 1;
+        $settings->vendor_number_counter = 1;
+        $settings->ticket_number_counter = 1;
+        $settings->payment_number_counter = 1;
+        $settings->project_number_counter = 1;
+        $settings->task_number_counter = 1;
+        $settings->expense_number_counter = 1;
+        $settings->client_number_counter = 1;
+
+        $company->settings = $settings;
+        $company->save();
+
+        \Log::debug("Counters Reset  Successfully");
+        \Log::debug("Invoice #". $settings->invoice_number_counter);
     }
 
 
