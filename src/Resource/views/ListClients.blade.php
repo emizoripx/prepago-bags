@@ -11,33 +11,94 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.9.0/jquery.validate.min.js"></script>
     <title>Clientes</title>
+
+    <style>
+        .has-search .form-control-feedback {
+            position: absolute;
+            z-index: 2;
+            display: block;
+            width: 2.375rem;
+            height: 2.375rem;
+            line-height: 2.375rem;
+            text-align: center;
+            pointer-events: none;
+            color: #aaa;
+        }
+
+        .table-style-custom {
+            position: fixed;
+            margin-top: 5%;
+            width: 80%;
+            height: 600px;
+            overflow-y: scroll;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container">
-        <h3>Clientes de la plataforma</h3>
-        <div >
+    <div class="col-md-10 offset-md-1" style="margin-top:50px;">
+        <nav class="position-fixed col-md-12">
+            <h3>Clientes de la plataforma</h3>
+
+            <form action="{{url('dashboard/clients')}}">
+
+                <div class="form-group has-search d-inline-block col-md-6">
+                    <span class="fa fa-search form-control-feedback"></span>
+                    <input type="text" class="form-control" placeholder="Buscar por correo del dueño" id="search" name="search" value="{!! $search !!}" autocomplete="off" autofocus="on">
+                </div>
+                <div class="form-group d-inline-block">
+                    <select name="phase" value="{!! $phase !!}" class="form-control">
+                        @if ($phase == "")
+                        <option value="" selected>Todas las fases</option>
+                        <option value="Testing">Fase Testing</option>
+                        <option value="Piloto testing">Fase Piloto</option>
+                        <option value="Production">Fase Producción</option>
+                        @elseif ($phase == "Testing")
+                        <option value="">Todas las fases</option>
+                        <option value="Testing" selected>Fase Testing</option>
+                        <option value="Piloto testing">Fase Piloto</option>
+                        <option value="Production">Fase Producción</option>
+                        @elseif ($phase == "Piloto testing")
+                        <option value="">Todas las fases</option>
+                        <option value="Testing">Fase Testing</option>
+                        <option value="Piloto testing" selected>Fase Piloto</option>
+                        <option value="Production">Fase Producción</option>
+                        @elseif ($phase == "Production")
+                        <option value="">Todas las fases</option>
+                        <option value="Testing">Fase Testing</option>
+                        <option value="Piloto testing">Fase Piloto</option>
+                        <option value="Production" selected>Fase Producción</option>
+                        @endif
+                    </select>
+                </div>
+                <div class="form-group d-inline-block">
+                    <button type="submit" class="btn form-control btn-primary d-inline-block"> Filtrar</button>
+                </div>
+            </form>
+
+
+        </nav>
+        <div class="table-style-custom col-md-12">
             <table class="table table-striped table-bordered" style="table-layout: fixed;">
                 <thead>
-                    <th width="5%">#</th>
+                    
                     <th width="10%">Compañia</th>
                     <th width="20%">Dueño</th>
-                    {{-- <th width="15%">Cant disponible facturas</th> --}}
-                    <th width="10%">Producción</th>
+                    <th width="15%">Fecha creación</th>
                     <th width="10%">Tipo de Cuenta</th>
-                    <th width="10%">Fase</th>
-                    <th width="10%">Estado</th>
+                    <th align="center" width="10%">Fase</th>
+                    <th align="center" width="10%">Estado</th>
                     <th width="10%">Acciones</th>
                 </thead>
+
                 <tbody>
                     @foreach($clientsPrepago as $client)
                     <tr>
-                        <td>{{ $client->id }}</td>
+                        
                         <td>{{ json_decode($client->settings)->name }}</td>
                         <td>{{ $client->email }}</td>
-                        {{-- <td>{{ $client->invoice_number_available }}</td> --}}
+                        <td>{{ $client->created_at }}</td>
 
-                        <td align="center">{{ $client->production ? "Sí" : "No" }}</td>
                         <td align="center">{!! $client->account_type_badge !!}</td>
                         <td align="center">{!! $client->phase !!}</td>
                         <td align="center">{{ $client->enabled == 'active' ? "Activo": "Suspendido" }}</td>
@@ -60,9 +121,10 @@
                                     @if($client->enabled == 'active')
                                     <a class="dropdown-item disabled" href="#">Suspender</a>
                                     @else
-                                    <a class="dropdown-item disabled" data-type="data-action" data- onclick="enablePostpago( $client->company_id )">Habilitar</a>
+                                    <a class="dropdown-item disabled" data-type="data-action" data-onclick="enablePostpago( $client->company_id )">Habilitar</a>
                                     @endif
                                     @endif
+                                    <a class="dropdown-item" data-type="actions-dashboard" data-href="{{ URL::to('dashboard/form-information/' . $client->company_id)}}" data-container=".action-modal">Información</a>
                                 </div>
                             </div>
                         </td>
@@ -70,17 +132,13 @@
                     @endforeach
                 </tbody>
             </table>  
-            {{ $clientsPrepago->links() }}
-
-
+            {{ $clientsPrepago->withQueryString()->links() }}
         </div>
 
 
     </div>
 
     <div class="modal fade action-modal" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel"></div>
-
-
 
     <script>
         $(document).on('click', '[data-type=actions-dashboard]', function() {
@@ -139,6 +197,13 @@
                         });
                     },
                 });
+        });
+
+
+        $('#search').on("keypress", function(e) {
+            if (e.which == 13) {
+                location.reload();
+            }
         });
     </script>
 

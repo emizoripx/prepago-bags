@@ -39,6 +39,7 @@ class PrepagoBags {
             Route::post('dashboard/production-up', 'CompanyAccountController@productionUp')->name('dashboard.production');
             Route::get('dashboard/form-phase-piloto/{company_id}', 'DashboardController@showForm');
             Route::get('dashboard/form-phase-production/{company_id}', 'DashboardController@showForm2');
+            Route::get('dashboard/form-information/{company_id}', 'DashboardController@showInformation');
             
         });
 

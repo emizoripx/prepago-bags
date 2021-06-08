@@ -73,6 +73,12 @@ class FelCompanyDocumentSector extends Model
         return $this;
     }
 
+    public function setCounter($sign = 1){
+        $this->counter = $this->counter + (1 * $sign);
+        \Log::debug("#Cantidad facturas hechas :" . $this->counter);
+        return $this;
+    }
+
     public static function getCompanyDocumentSectorByCode($fel_company_id, $sector_document_code){
         return self::where('fel_company_id', $fel_company_id)->where('fel_doc_sector_id', $sector_document_code)->first();
     }

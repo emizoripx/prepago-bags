@@ -8,7 +8,7 @@ use EmizorIpx\PrepagoBags\Observers\AccountObserver;
 use EmizorIpx\PrepagoBags\Services\AccountPrepagoBagService;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
-
+use Illuminate\Pagination\Paginator;
 class PrepagoBagsServiceProvider extends ServiceProvider
 {
     /**
@@ -29,7 +29,7 @@ class PrepagoBagsServiceProvider extends ServiceProvider
     public function boot()
     {
         // Migrations
-
+        Paginator::useBootstrap();
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
 
         //  CONFIG FILE
