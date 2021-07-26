@@ -31,18 +31,18 @@ class AccountPrepagoBagService {
         // $hashid = new Hashids(config('ninja.hash_salt'), 10);
 
         // $company_id = $hashid->decode($company_id);
+        $accountDetail = FelCompanyDocumentSector::getCompanyDocumentSectorByCode($this->fel_company->id, $sector_document_type_code);
+        if (!$accountDetail) {
+            throw new PrepagoBagsException('No existe una bolsa prepago para el tipo de Factura');
+        }
         if(!$this->fel_company->is_postpago){
 
             // $accountDetail = FelCompanyDocumentSector::where('fel_company_id', $this->fel_company->id)->where('fel_doc_sector_id', $sector_document_type_code)->first();
-            $accountDetail = FelCompanyDocumentSector::getCompanyDocumentSectorByCode($this->fel_company->id, $sector_document_type_code);
     
-            if (!$accountDetail) {
-                throw new PrepagoBagsException('No existe una bolsa prepago para el tipo de Factura');
-            }
             $accountDetail->checkBagDuedate();
             $accountDetail->checkInvoiceAvailable();
-            return $accountDetail;
         }
+        return $accountDetail;
 
         
     }

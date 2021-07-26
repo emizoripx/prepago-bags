@@ -67,14 +67,19 @@ class FelCompanyDocumentSector extends Model
         return $this;
     }
 
-    public function addNumberInvoice(){
-        $this->invoice_number_available = $this->invoice_number_available + 1;
+    public function addNumberInvoice($add = 1){
+        $this->invoice_number_available = $this->invoice_number_available + $add;
         \Log::debug("#Facturas disponibles :" . $this->invoice_number_available);
         return $this;
     }
 
     public function setCounter($sign = 1){
         $this->counter = $this->counter + (1 * $sign);
+        \Log::debug("#Cantidad facturas hechas :" . $this->counter);
+        return $this;
+    }
+    public function setPostpagoCounter($sign = 1){
+        $this->postpago_counter = $this->postpago_counter + (1 * $sign);
         \Log::debug("#Cantidad facturas hechas :" . $this->counter);
         return $this;
     }
