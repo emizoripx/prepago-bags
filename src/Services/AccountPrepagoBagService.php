@@ -97,4 +97,69 @@ class AccountPrepagoBagService {
     }
 
 
+    public function savePostpagoLimit($sectorDocuments ){
+
+        try{
+            foreach ($sectorDocuments as $key => $value) {
+                FelCompanyDocumentSector::createOrUpdate([
+                    'company_id' => $this->fel_company->company_id,
+                    'fel_doc_sector_id' => $key,
+                    'postpago_limit' => intval($value),
+                    'fel_company_id' => $this->fel_company->id
+                ]);
+            }
+            return $this;
+        } catch(Exception $ex){
+            \Log::debug("Error al Registrar Limit Company Sector Documents...". $ex);
+            bitacora_error('AccountPrepagoBagService:UpdateLimitSectorDocuments', $ex->getMessage());
+        }
+
+    }
+
+    public function saveStartDate(){
+        try{
+            FelCompanyDocumentSector::where('company_id', $this->fel_company->company_id)->update([
+                'start_date' => Carbon::now()->toDateString()
+            ]);
+
+            return $this;
+        } catch(Exception $ex){
+            \Log::debug("Error al Actualizar startDate");
+        }
+    }
+    public function saveFrequency( $frequency ){
+        try{
+            FelCompanyDocumentSector::where('company_id', $this->fel_company->company_id)->update([
+                'frequency' => $frequency
+            ]);
+            return $this;
+        } catch(Exception $ex){
+            \Log::debug("Error al Frequency startDate");
+        }
+    }
+
+    public function resetInvoiceAvailable(){
+        try{
+            \Log::debug("Reset Invoice Available");
+            FelCompanyDocumentSector::resetInvoiceAvailable($this->fel_company->company_id);
+
+            return $this;
+
+        } catch ( Exception $ex ){
+            \Log::debug("Error to reset Invoice Available...". $ex);
+        }
+    }
+    public function resetCounter(){
+        try{
+            \Log::debug("Reset Counter");
+            FelCompanyDocumentSector::resetCounter($this->fel_company->company_id);
+
+            return $this;
+
+        } catch ( Exception $ex ){
+            \Log::debug("Error to reset Invoice Available...". $ex);
+        }
+    }
+
+
 }

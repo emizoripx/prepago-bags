@@ -190,7 +190,7 @@ class CompanyAccountController extends Controller
             //     $this->accountPrepagoBagsService->addBagGift($company_id);
             // }
 
-            $companyAccount->is_postpago ? $companyAccount->resetInvoiceAvailable()->save() :  $company->company_detail->service()->registerCompanySectorDocuments()->addBagGift();; 
+            $companyAccount->is_postpago ? $companyAccount->service()->resetInvoiceAvailable()->resetCounter()->saveStartDate()->saveFrequency($data['frequency'])->savePostpagoLimit($data['postpago_limit']) :  $company->company_detail->service()->registerCompanySectorDocuments()->addBagGift();; 
 
             $usersToken = $company->tokens;
             foreach($usersToken as $token){
