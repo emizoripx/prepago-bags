@@ -86,7 +86,7 @@ class FelCompanyDocumentSector extends Model
 
         if( $current_date > $data_postpago_limit){
             if($this->postpago_limit < $this->postpago_counter && $this->postpago_limit != -1){
-                $postpago_exceded_limit = $this->postpago_exceded_limit = ($this->postpago_counter - $this->postpago_limit);
+                $postpago_exceded_limit = $this->postpago_exceded_limit + ($this->postpago_counter - $this->postpago_limit);
 
                 $this->postpago_exceded_limit = $postpago_exceded_limit;
             }
