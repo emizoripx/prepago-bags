@@ -15,6 +15,8 @@ class DashboardController extends Controller
         $search = request('search' , "");
         $phase = request('phase' , "");
 
+        $company = request('company')->only('company_key');
+
         if ($phase != "Testing" && $phase != "Production") $phase == "";
 
         
@@ -34,7 +36,7 @@ class DashboardController extends Controller
                     ->paginate(30);
 
         
-        return view('prepagobags::ListClients', compact('clientsPrepago', "search", "phase"));
+        return view('prepagobags::ListClients', compact('clientsPrepago', "search", "phase", "company"));
 
     }
 

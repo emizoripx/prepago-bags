@@ -177,12 +177,16 @@
                         e.preventDefault();
                         console.log("submit en este formulario");
                         var data = $(form).serialize();
+                        var company = @json($company);
                         $(form)
                             .find('button[type="submit"]')
                             .attr('disabled', true);
                         $.ajax({
                             method: 'POST',
                             url: $(form).attr('action'),
+                            headers: {
+                                'X-API-COMPANY-KEY': company.company_key
+                            },
                             dataType: 'json',
                             data: data,
                             success: function(result) {
