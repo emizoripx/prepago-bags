@@ -15,6 +15,11 @@ class DashboardController extends Controller
         $search = request('search' , "");
         $phase = request('phase' , "");
 
+        $user_hash = [ 'hash' => request()->header('user')];
+
+        \Log::debug("User Hash");
+        \Log::debug($user_hash);
+
         if ($phase != "Testing" && $phase != "Production") $phase == "";
 
         
@@ -34,7 +39,7 @@ class DashboardController extends Controller
                     ->paginate(30);
 
         
-        return view('prepagobags::ListClients', compact('clientsPrepago', "search", "phase"));
+        return view('prepagobags::ListClients', compact('clientsPrepago', "search", "phase", "user_hash"));
 
     }
 
