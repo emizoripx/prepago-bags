@@ -15,7 +15,10 @@ class DashboardController extends Controller
         $search = request('search' , "");
         $phase = request('phase' , "");
 
-        $company = request('company')->only('company_key');
+        $user_hash = [ 'hash' => request()->header('user')];
+
+        \Log::debug("User Hash");
+        \Log::debug($user_hash);
 
         if ($phase != "Testing" && $phase != "Production") $phase == "";
 
@@ -36,7 +39,7 @@ class DashboardController extends Controller
                     ->paginate(30);
 
         
-        return view('prepagobags::ListClients', compact('clientsPrepago', "search", "phase", "company"));
+        return view('prepagobags::ListClients', compact('clientsPrepago', "search", "phase", "user_hash"));
 
     }
 

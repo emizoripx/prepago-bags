@@ -177,7 +177,8 @@
                         e.preventDefault();
                         console.log("submit en este formulario");
                         var data = $(form).serialize();
-                        var company = @json($company);
+                        var user = @json($user_hash);
+
                         $(form)
                             .find('button[type="submit"]')
                             .attr('disabled', true);
@@ -185,7 +186,7 @@
                             method: 'POST',
                             url: $(form).attr('action'),
                             headers: {
-                                'X-API-COMPANY-KEY': company.company_key
+                                'user': user.hash
                             },
                             dataType: 'json',
                             data: data,
