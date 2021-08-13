@@ -32,7 +32,11 @@ class StorePostpagoPlanRequest extends FormRequest
             $rule['sector_doc_id'] = 'required|integer';
         }
         return array_merge( $rule, [
-            'name' => 'required|string|unique:postpago_plans',
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('postpago_plans')->ignore(request('id'))
+            ],
             'price' => [
                 'required',
                 new CheckDecimals(7,2)

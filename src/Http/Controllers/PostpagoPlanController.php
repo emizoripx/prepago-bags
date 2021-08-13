@@ -2,6 +2,7 @@
 
 namespace EmizorIpx\PrepagoBags\Http\Controllers;
 
+use App\Utils\Traits\MakesHash;
 use EmizorIpx\PrepagoBags\Http\Requests\StorePostpagoPlanRequest;
 use EmizorIpx\PrepagoBags\Http\Resources\PostpagoPlanResource;
 use EmizorIpx\PrepagoBags\Models\PostpagoPlan;
@@ -11,13 +12,20 @@ use Illuminate\Routing\Controller;
 
 class PostpagoPlanController extends Controller
 {
+    use MakesHash;
+
     public function index( Request $request ){
 
         \Log::debug("Get Index");
 
-        $postpago_plans = PostpagoPlan::paginate(30);
+        $search = request('search');
 
-        return view('prepagobags::ListPlanes', compact('postpago_plans'));
+        $postpago_plans = PostpagoPlan::when($search, function ($query, $search) {
+                            return $query->where('name','like', "%".$search."%");
+                        })
+                        ->paginate(30);
+
+        return view('prepagobags::ListPlanes', compact('postpago_plans', 'search'));
 
     }
 
@@ -44,4 +52,45 @@ class PostpagoPlanController extends Controller
         }
 
     }
+
+    public function update( StorePostpagoPlanRequest $request, $id ){
+
+        $data = $request->all();
+
+        $idPlanDecode = $this->decodePrimaryKey($id);
+
+        try{
+            $plan = PostpagoPlan::whereId($idPlanDecode)->first();
+
+            if(!$plan){
+                throw new Exception('Plan No encontrado');
+            }
+
+            $plan->update($data);
+
+            return response()->json([
+                'success' => true,
+                'data' => new PostpagoPlanResource($plan)
+            ]);
+        } catch(Exception $ex){
+            return response()->json([
+                'success' => false,
+                'msg' => $ex->getMessage()
+            ]);
+        }
+
+    }
+
+
+    public function show( Request $request, $id ){
+
+        $idPlanDecode = $this->decodePrimaryKey($id);
+
+        $postpago_plans = PostpagoPlan::find($idPlanDecode);
+
+        return new PostpagoPlanResource($postpago_plans);
+
+    }
+
+
 }
