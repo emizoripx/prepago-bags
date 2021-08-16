@@ -1,7 +1,7 @@
 <!-- Modal -->
-{{-- <div class="modal fade" id="createFormModal" tabindex="-1" aria-labelledby="createFormModalLabel" aria-hidden="false"> --}}
+{{-- <div class="modal fade" id="editFormModal" tabindex="-1" aria-labelledby="editFormModalLabel" aria-hidden="false"> --}}
 <div class="modal-dialog  modal-dialog-centered modal-lg">
-    <form action="{!! URL::to('dashboard/postpago-plans') !!}" method="post" id="actionFormCreate">
+    <form action="{!! URL::to('dashboard/postpago-plans/' . $plan->id) !!}" method="post" id="actionFormCreate">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Agregar Plan Postpago</h5>
@@ -11,11 +11,13 @@
             </div>
             <div class="modal-body">
                 <div class="container">
+                    @method('put')
                     @csrf
                     <div class="row">
                         <div class="form-group  col-md-12">
                             <label for="name">Nombre</label>
-                            <input id="name" name="name" class="col-md-12 form-control" type="text">
+                            <input id="name" name="name" class="col-md-12 form-control" type="text"
+                                value="{{ $plan->name }}">
                             @error('name')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
@@ -24,21 +26,24 @@
                     <div class="row d-flex justify-content-between">
                         <div class="form-group col-md-2">
                             <label for="name">#Facturas</label>
-                            <input class="col-md-12 form-control" id="num_invoices" name="num_invoices" type="number">
+                            <input class="col-md-12 form-control" id="num_invoices" name="num_invoices" type="number"
+                                value="{{ $plan->num_invoices }}">
                             @error('num_invoices')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="form-group col-md-2">
                             <label for="name">#Clientes</label>
-                            <input class="col-md-12 form-control" id="num_clients" name="num_clients" type="number">
+                            <input class="col-md-12 form-control" id="num_clients" name="num_clients" type="number"
+                                value="{{ $plan->num_clients }}">
                             @error('num_clients')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="form-group col-md-2">
                             <label for="name">#Productos</label>
-                            <input class="col-md-12 form-control" id="num_products" name="num_products" type="number">
+                            <input class="col-md-12 form-control" id="num_products" name="num_products" type="number"
+                                value="{{ $plan->num_products }}">
                             @error('num_products')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
@@ -46,7 +51,8 @@
                         </div>
                         <div class="form-group col-md-2">
                             <label for="num_branches">#Sucursales</label>
-                            <input class="col-md-12 form-control" id="num_branches" name="num_branches" type="number">
+                            <input class="col-md-12 form-control" id="num_branches" name="num_branches" type="number"
+                                value="{{ $plan->num_branches }}">
                             @error('num_branches')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
@@ -54,7 +60,8 @@
                         </div>
                         <div class="form-group col-md-2">
                             <label for="name">#Usuarios</label>
-                            <input class="col-md-12 form-control" id="num_users" name="num_users" type="number">
+                            <input class="col-md-12 form-control" id="num_users" name="num_users" type="number"
+                                value="{{  $plan->num_users }}">
                             @error('num_users')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
@@ -64,7 +71,7 @@
                         <div class="form-group col-md-2">
                             <label for="name">Prorateo Factura</label>
                             <input class="col-md-12 form-control" id="prorated_invoice" name="prorated_invoice"
-                                type="text">
+                                type="text" value="{{ $plan->prorated_invoice }}">
                             @error('prorated_invoice')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
@@ -72,15 +79,20 @@
                         <div class="form-group col-md-2">
                             <label for="name">Prorateo Cliente</label>
                             <input class="col-md-12 form-control" id="prorated_clients" name="prorated_clients"
-                                type="text">
+                                type="text" value="{{ $plan->prorated_clients }}">
                             @error('prorated_clients')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="form-group col-md-2">
                             <label for="name">Prorateo Producto</label>
-                            <input class="col-md-12 form-control" id="prorated_products" name="prorated_products"
-                                type="text">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">$</span>
+                                </div>
+                                <input class="col-md-12 form-control" id="prorated_products" name="prorated_products"
+                                    type="text" value="{{ $plan->prorated_products }}">
+                            </div>
                             @error('prorated_products')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
@@ -88,7 +100,7 @@
                         <div class="form-group col-md-2">
                             <label for="prorated_branches">Prorateo Sucursales</label>
                             <input class="col-md-12 form-control" id="prorated_branches" name="prorated_branches"
-                                type="number">
+                                type="number" value="{{ $plan->prorated_branches }}">
                             @error('prorated_branches')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
@@ -96,7 +108,9 @@
                         </div>
                         <div class="form-group col-md-2">
                             <label for="name">Prorateo Usuario</label>
-                            <input class="col-md-12 form-control" id="prorated_users" name="prorated_users" type="text">
+
+                            <input class="col-md-12 form-control" id="prorated_users" name="prorated_users" type="text"
+                                value="{{ $plan->prorated_users }}">
                             @error('prorated_users')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
@@ -105,7 +119,7 @@
                     <div class="row">
                         <div class="form-group col-md-6">
                             <label for="name">Frecuencia</label>
-                            <Select class="col-md-12 form-control" id="frequency" name="frequency">
+                            <select class="col-md-12 form-control" id="frequency" name="frequency">
                                 <option value="1">1 Mes</option>
                                 <option value="2">2 Meses</option>
                                 <option value="3">3 Meses</option>
@@ -118,14 +132,15 @@
                                 <option value="10">10 Meses</option>
                                 <option value="11">11 Meses</option>
                                 <option value="12">12 Meses</option>
-                            </Select>
+                            </select>
                             @error('frequency')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="form-group col-md-6">
                             <label for="price">Costo</label>
-                            <input class="col-md-12 form-control" id="price" name="price" type="number">
+                            <input class="col-md-12 form-control" id="price" name="price" type="number"
+                                value="{{ $plan->price }}">
                             @error('price')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
@@ -137,8 +152,8 @@
                             <label for="all_sector_docs">Todos los Documentos Sector</label>
                             {{-- <input class="col-md-12" id="all_sector_docs" type="text"> --}}
                             <div class="switch">
-                                <input id="all_sector_docs" name="all_sector_docs"
-                                    class="cmn-toggle cmn-toggle-round form-control" type="checkbox">
+                                <input id="all_sector_docs" name="all_sector_docs" class="cmn-toggle cmn-toggle-round "
+                                    type="checkbox" @if ($plan->all_sector_docs) checked value="1" @endif>
                                 <label for="all_sector_docs"></label>
                             </div>
                             @error('all_sector_docs')
@@ -166,8 +181,8 @@
                             <label for="enable_overflow">Prorateo Habilitado</label>
                             {{-- <input class="col-md-12" id="enable_overflow" type="text"> --}}
                             <div class="switch">
-                                <input id="enable_overflow" name="enable_overflow"
-                                    class="cmn-toggle cmn-toggle-round form-control" type="checkbox">
+                                <input id="enable_overflow" name="enable_overflow" class="cmn-toggle cmn-toggle-round"
+                                    type="checkbox" @if ($plan->enable_overflow) checked value="1" @endif>
                                 <label for="enable_overflow"></label>
 
                             </div>
@@ -185,7 +200,9 @@
     </form>
 </div>
 <script>
-    $(document).ready(function(){
+    $(document).ready(function() {
+        
+
         $('#enable_overflow').click(function() {
             var enable_overflow = $('#enable_overflow').val();
 

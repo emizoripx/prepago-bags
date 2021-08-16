@@ -27,8 +27,10 @@ class StorePostpagoPlanRequest extends FormRequest
     public function rules()
     {
         \Log::debug("Validation");
+        \Log::debug(request());
         $rule = ['sector_doc_id' => 'integer'];
-        if(request('all_sector_docs') != true){
+        $all_sectos_docs = request('all_sector_docs');
+        if( !isset($all_sectos_docs) ){
             $rule['sector_doc_id'] = 'required|integer';
         }
         return array_merge( $rule, [
@@ -66,9 +68,8 @@ class StorePostpagoPlanRequest extends FormRequest
                 'numeric',
                 new CheckDecimals(5,2)
             ],
-            'frequency' => 'required|integer',
+            'frequency' => 'integer',
             'all_sector_docs' => 'boolean',
-            'sector_doc_id' => 'integer',
             'enable_overflow' => 'boolean',
             'public' => 'boolean'
         ]);

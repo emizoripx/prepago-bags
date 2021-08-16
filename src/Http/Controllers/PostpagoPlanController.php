@@ -3,6 +3,8 @@
 namespace EmizorIpx\PrepagoBags\Http\Controllers;
 
 use App\Utils\Traits\MakesHash;
+use EmizorIpx\ClientFel\Utils\TypeDocuments;
+use EmizorIpx\ClientFel\Utils\TypeDocumentSector;
 use EmizorIpx\PrepagoBags\Http\Requests\StorePostpagoPlanRequest;
 use EmizorIpx\PrepagoBags\Http\Resources\PostpagoPlanResource;
 use EmizorIpx\PrepagoBags\Models\PostpagoPlan;
@@ -24,6 +26,7 @@ class PostpagoPlanController extends Controller
                             return $query->where('name','like', "%".$search."%");
                         })
                         ->paginate(30);
+        // $document_sectors = TypeDocumentSector::ARRAY_NAMES;
 
         return view('prepagobags::ListPlanes', compact('postpago_plans', 'search'));
 
@@ -32,6 +35,9 @@ class PostpagoPlanController extends Controller
     public function store(StorePostpagoPlanRequest $request){
 
         $data = $request->all();
+
+        $data['all_sector_docs'] = isset($data['all_sector_docs']) ? isset($data['all_sector_docs']) : false;
+        $data['enable_overflow'] = isset($data['enable_overflow']) ? isset($data['enable_overflow']) : false;
 
         \Log::debug("Store Postpago Plans");
         \Log::debug($data);
@@ -51,6 +57,18 @@ class PostpagoPlanController extends Controller
             ]);
         }
 
+    }
+
+    public function formCreate(){
+
+        return view('prepagobags::components.createFormModal',['document_sectors' => TypeDocumentSector::ARRAY_NAMES]);
+    }
+
+    public function formEdit($plan_id){
+        $data = PostpagoPlan::where('id', $plan_id)->first();
+        \Log::debug($data->id);
+
+        return view('prepagobags::components.editFormModal',["plan" => $data, 'document_sectors' => TypeDocumentSector::ARRAY_NAMES]);
     }
 
     public function update( StorePostpagoPlanRequest $request, $id ){
@@ -73,10 +91,7 @@ class PostpagoPlanController extends Controller
                 'data' => new PostpagoPlanResource($plan)
             ]);
         } catch(Exception $ex){
-            return response()->json([
-                'success' => false,
-                'msg' => $ex->getMessage()
-            ]);
+            return back();
         }
 
     }
