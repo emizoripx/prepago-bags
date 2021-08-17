@@ -30,6 +30,11 @@
             padding: 2px;
         }
 
+        .switch-span{
+            font-size: 14px;
+            padding-bottom: 2px;
+        }
+
         /*
         *
         * ==========================================
@@ -213,13 +218,14 @@
                         console.log($('#enable_overflow').val());
 
                         var data = $(form).serialize();
-
+                        console.log('Metodo HTTP');
+                        console.log($("input[name='_method']").val());
 
                         $(form)
                             .find('button[type="submit"]')
                             .attr('disabled', true);
                         $.ajax({
-                            method: 'POST',
+                            method: $("input[name='_method']").val(),
                             url: $(form).attr('action'),
                             headers: {},
                             dataType: 'json',
@@ -234,12 +240,21 @@
                                 }
                             },
                             error: function(response) {
+                                
                                 $.each(response.responseJSON.errors, function(field_name,
                                 error) {
                                     $(document).find('[name=' + field_name + ']').after(
                                         '<span class="alert alert-danger">' +
                                         error + '</span>');
                                 })
+
+                                if(response.success == false){
+                                    alert(result.msg);
+                                }
+
+                                $(form)
+                                .find('button[type="submit"]')
+                                .attr('disabled', false);
                             }
                         });
                     },

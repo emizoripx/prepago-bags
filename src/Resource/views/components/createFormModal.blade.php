@@ -2,6 +2,7 @@
 {{-- <div class="modal fade" id="createFormModal" tabindex="-1" aria-labelledby="createFormModalLabel" aria-hidden="false"> --}}
 <div class="modal-dialog  modal-dialog-centered modal-lg">
     <form action="{!! URL::to('dashboard/postpago-plans') !!}" method="post" id="actionFormCreate">
+        @method('post')
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Agregar Plan Postpago</h5>
@@ -63,32 +64,52 @@
                     <div class="row d-flex justify-content-between">
                         <div class="form-group col-md-2">
                             <label for="name">Prorateo Factura</label>
-                            <input class="col-md-12 form-control" id="prorated_invoice" name="prorated_invoice"
-                                type="text">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">$</span>
+                                </div>
+                                <input class="col-md-12 form-control" id="prorated_invoice" name="prorated_invoice"
+                                    type="text">
+                            </div>
                             @error('prorated_invoice')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="form-group col-md-2">
                             <label for="name">Prorateo Cliente</label>
-                            <input class="col-md-12 form-control" id="prorated_clients" name="prorated_clients"
-                                type="text">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">$</span>
+                                </div>
+                                <input class="col-md-12 form-control" id="prorated_clients" name="prorated_clients"
+                                    type="text">
+                            </div>
                             @error('prorated_clients')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="form-group col-md-2">
                             <label for="name">Prorateo Producto</label>
-                            <input class="col-md-12 form-control" id="prorated_products" name="prorated_products"
-                                type="text">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">$</span>
+                                </div>
+                                <input class="col-md-12 form-control" id="prorated_products" name="prorated_products"
+                                    type="text">
+                            </div>
                             @error('prorated_products')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="form-group col-md-2">
                             <label for="prorated_branches">Prorateo Sucursales</label>
-                            <input class="col-md-12 form-control" id="prorated_branches" name="prorated_branches"
-                                type="number">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">$</span>
+                                </div>
+                                <input class="col-md-12 form-control" id="prorated_branches" name="prorated_branches"
+                                    type="number">
+                            </div>
                             @error('prorated_branches')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
@@ -96,7 +117,13 @@
                         </div>
                         <div class="form-group col-md-2">
                             <label for="name">Prorateo Usuario</label>
-                            <input class="col-md-12 form-control" id="prorated_users" name="prorated_users" type="text">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">$</span>
+                                </div>
+                                <input class="col-md-12 form-control" id="prorated_users" name="prorated_users"
+                                    type="text">
+                            </div>
                             @error('prorated_users')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
@@ -136,10 +163,14 @@
                         <div class="form-group col-md-3">
                             <label for="all_sector_docs">Todos los Documentos Sector</label>
                             {{-- <input class="col-md-12" id="all_sector_docs" type="text"> --}}
-                            <div class="switch">
-                                <input id="all_sector_docs" name="all_sector_docs"
-                                    class="cmn-toggle cmn-toggle-round form-control" type="checkbox">
-                                <label for="all_sector_docs"></label>
+                            <div class="d-flex">
+                                <span class="switch-span col-md-6" id="label_all_sector_docs"> Desactivado </span>
+                                &nbsp;
+                                <div class="switch d-flex align-items-end col-md-6">
+                                    <input id="all_sector_docs" name="all_sector_docs"
+                                        class="cmn-toggle cmn-toggle-round form-control" type="checkbox">
+                                    <label for="all_sector_docs"></label>
+                                </div>
                             </div>
                             @error('all_sector_docs')
                                 <div class="alert alert-danger">{{ $message }}</div>
@@ -165,11 +196,14 @@
                         <div class="form-group col-md-3">
                             <label for="enable_overflow">Prorateo Habilitado</label>
                             {{-- <input class="col-md-12" id="enable_overflow" type="text"> --}}
-                            <div class="switch">
-                                <input id="enable_overflow" name="enable_overflow"
-                                    class="cmn-toggle cmn-toggle-round form-control" type="checkbox">
-                                <label for="enable_overflow"></label>
-
+                            <div class="d-flex d-flex align-items-end ">
+                                <span class=" col-md-6 switch-span" id="label_enable_overflow"> Desactivado</span>
+                                &nbsp;
+                                <div class="switch col-md-6">
+                                    <input id="enable_overflow" name="enable_overflow"
+                                        class="cmn-toggle cmn-toggle-round form-control" type="checkbox">
+                                    <label for="enable_overflow"></label>
+                                </div>
                             </div>
                         </div>
 
@@ -185,30 +219,34 @@
     </form>
 </div>
 <script>
-    $(document).ready(function(){
+    $(document).ready(function() {
         $('#enable_overflow').click(function() {
             var enable_overflow = $('#enable_overflow').val();
 
             console.log("Checked");
             console.log($('#enable_overflow').prop("checked"));
-            if (enable_overflow == 'on') {
+            if (enable_overflow == 'on' || $('#enable_overflow').prop("checked")) {
                 $('#enable_overflow').val(1);
+                $('#label_enable_overflow').html('Activado');
             } else {
                 $('#enable_overflow').val(0);
+                $('#label_enable_overflow').html('Desactivado');
             }
         });
 
         $('#all_sector_docs').click(function() {
             var all_sector_docs = $('#all_sector_docs').val();
             console.log(all_sector_docs);
-            if (all_sector_docs == 'on') {
+            if (all_sector_docs == 'on' || $('#all_sector_docs').prop("checked")) {
                 $('#all_sector_docs').val(1);
 
+                $('#label_all_sector_docs').html('Activado');
                 $('#sector_doc_id').prop("disabled", true);
                 $('#sector_doc_id').val(0);
             } else {
                 $('#all_sector_docs').val(0);
 
+                $('#label_all_sector_docs').html('Desactivado');
                 $('#sector_doc_id').prop("disabled", false);
                 $('#sector_doc_id').val(1);
             }

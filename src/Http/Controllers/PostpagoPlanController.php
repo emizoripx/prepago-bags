@@ -18,7 +18,6 @@ class PostpagoPlanController extends Controller
 
     public function index( Request $request ){
 
-        \Log::debug("Get Index");
 
         $search = request('search');
 
@@ -39,8 +38,6 @@ class PostpagoPlanController extends Controller
         $data['all_sector_docs'] = isset($data['all_sector_docs']) ? isset($data['all_sector_docs']) : false;
         $data['enable_overflow'] = isset($data['enable_overflow']) ? isset($data['enable_overflow']) : false;
 
-        \Log::debug("Store Postpago Plans");
-        \Log::debug($data);
 
         try {
             
@@ -53,7 +50,7 @@ class PostpagoPlanController extends Controller
         } catch (Exception $ex) {
             return response()->json([
                 'success' => false,
-                'data' => $ex->getMessage()
+                'msg' => $ex->getMessage()
             ]);
         }
 
@@ -75,10 +72,11 @@ class PostpagoPlanController extends Controller
 
         $data = $request->all();
 
-        $idPlanDecode = $this->decodePrimaryKey($id);
+        $data['all_sector_docs'] = isset($data['all_sector_docs']) ? isset($data['all_sector_docs']) : false;
+        $data['enable_overflow'] = isset($data['enable_overflow']) ? isset($data['enable_overflow']) : false;
 
         try{
-            $plan = PostpagoPlan::whereId($idPlanDecode)->first();
+            $plan = PostpagoPlan::whereId($id)->first();
 
             if(!$plan){
                 throw new Exception('Plan No encontrado');
@@ -91,7 +89,11 @@ class PostpagoPlanController extends Controller
                 'data' => new PostpagoPlanResource($plan)
             ]);
         } catch(Exception $ex){
-            return back();
+            \Log::debug($ex->getMessage());
+            return response()->json([
+                'success' => false,
+                'msg' => $ex->getMessage()
+            ]);
         }
 
     }
