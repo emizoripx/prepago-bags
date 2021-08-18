@@ -99,11 +99,11 @@ class PostpagoPlanController extends Controller
     }
 
 
-    public function show( Request $request, $id ){
+    public function show(Request $request, $id ){
 
-        $idPlanDecode = $this->decodePrimaryKey($id);
+        // $idPlanDecode = $this->decodePrimaryKey($id);
 
-        $postpago_plans = PostpagoPlan::find($idPlanDecode);
+        $postpago_plans = PostpagoPlan::find($id);
 
         return new PostpagoPlanResource($postpago_plans);
 
