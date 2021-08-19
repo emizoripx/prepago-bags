@@ -138,6 +138,8 @@
                         <th width="15%">#Productos</th>
                         <th width="15%">#Usuarios</th>
                         <th width="10%">#Sucursales</th>
+                        <th width="10%">Prorateo Habilitado</th>
+                        <th width="10%">Documento Sector</th>
                         <th width="8%">Acciones</th>
                     </thead>
                     <tbody>
@@ -146,7 +148,7 @@
 
                                 <td>{{ $plan->name }}</td>
                                 <td>Bs {{ $plan->price }}</td>
-                                <td>{{ $plan->frequency }}</td>
+                                <td>{{ $plan->frequency }} Meses</td>
 
                                 <x-prepagobags::cell-split number="{{ $plan->num_invoices }}"
                                     prorated="{{ $plan->prorated_invoice }}" />
@@ -164,6 +166,8 @@
                                     <div>{{ $plan->num_branches == 0 ? 'Ilimitado' : $plan->num_branches }}</div>
                                 </td>
 
+                                <td>{{ $plan->enable_overflow == true ? 'Si' : 'No' }}</td>
+                                <td>{{ $plan->all_sector_docs == true ? 'Todos' : $document_sectors[$plan->sector_doc_id]  }}</td>
 
                                 <td align="center">
                                     <div class="">

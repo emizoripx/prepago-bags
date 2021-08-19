@@ -25,9 +25,9 @@ class PostpagoPlanController extends Controller
                             return $query->where('name','like', "%".$search."%");
                         })
                         ->paginate(30);
-        // $document_sectors = TypeDocumentSector::ARRAY_NAMES;
+        $document_sectors = TypeDocumentSector::ARRAY_NAMES;
 
-        return view('prepagobags::ListPlanes', compact('postpago_plans', 'search'));
+        return view('prepagobags::ListPlanes', compact('postpago_plans', 'search','document_sectors'));
 
     }
 
@@ -106,6 +106,55 @@ class PostpagoPlanController extends Controller
         $postpago_plans = PostpagoPlan::find($idPlanDecode);
 
         return new PostpagoPlanResource($postpago_plans);
+
+    }
+
+    public function publishPlan($id){
+        \Log::debug("Publish Plan ");
+        \Log::debug($id);
+        $plan = PostpagoPlan::whereId($id)->first();
+
+        try{
+            if(!$plan){
+                throw new Exception('Plan no encontrado');
+            }
+            $plan->update([
+                'public' => $plan->public == true ? false : true
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => new PostpagoPlanResource($plan)
+            ]);
+        } catch(Exception $ex){
+
+            return response()->json([
+                'success' => false,
+                'msg' => $ex->getMessage()
+            ]);
+
+        }
+
+
+    }
+
+    public function getPostpagoPlans( Request $request ){
+
+        try{
+            $postpago_plans = PostpagoPlan::pluck('name', 'id');
+    
+            return response()->json([
+                'success' => true,
+                'data' => $postpago_plans
+            ]);
+        } catch( Exception $ex ){
+            return response()->json([
+                'success' => false,
+                'msg' => $ex->getMessage()
+            ]);
+            
+        }
+
 
     }
 
