@@ -6,6 +6,7 @@ use EmizorIpx\ClientFel\Utils\TypeDocumentSector;
 use EmizorIpx\PrepagoBags\Http\Resources\CompanyDocumentSectorResource;
 use EmizorIpx\PrepagoBags\Models\AccountPrepagoBags;
 use EmizorIpx\PrepagoBags\Models\FelCompanyDocumentSector;
+use EmizorIpx\PrepagoBags\Models\PostpagoPlan;
 use Illuminate\Routing\Controller;
 
 class DashboardController extends Controller
@@ -17,8 +18,6 @@ class DashboardController extends Controller
 
         $user_hash = [ 'hash' => request()->header('user')];
 
-        \Log::debug("User Hash");
-        \Log::debug($user_hash);
 
         if ($phase != "Testing" && $phase != "Production") $phase == "";
 
@@ -69,11 +68,11 @@ class DashboardController extends Controller
                             ->where('companies.id',$companyid)
                             ->first();
         
-        $document_sectors = FelCompanyDocumentSector::whereCompanyId($companyid)->get([ 'fel_doc_sector_id']);
+        $document_sectors = FelCompanyDocumentSector::whereCompanyId($companyid)->get([ 'fel_doc_sector_id','invoice_number_available']);
 
+        $postpago_plans = PostpagoPlan::pluck('name', 'id');
 
-
-        return view('prepagobags::components.modal2',["company" => $data, "document_sectors" => $document_sectors, "arrayNames" => TypeDocumentSector::ARRAY_NAMES]);
+        return view('prepagobags::components.phaseProduction',["company" => $data, "document_sectors" => $document_sectors, "arrayNames" => TypeDocumentSector::ARRAY_NAMES, 'plans' => $postpago_plans]);
     }
 
     public function showInformation($companyId)

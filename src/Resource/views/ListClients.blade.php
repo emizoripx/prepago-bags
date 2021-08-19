@@ -2,34 +2,99 @@
 
 @section('content')
     <style>
-        .has-search .form-control-feedback {
+        
+        label {
+            font-size: 10px;
+        }
+        
+        label.btn {
+            font-size: 10px !important;
+            text-transform: uppercase !important;
+            color: white !important;
+        }
+        .switch-span{
+            font-size: 14px;
+            padding-bottom: 2px;
+        }
+        table#tbl_detalle th{
+            font-size: 14px;
+        }
+        table#tbl_detalle td{
+            font-size: 12px;
+        }
+        /*
+        *
+        * ==========================================
+        * CUSTOM UTIL CLASSES
+        * ==========================================
+        *
+        */
+        /* toggle switches with bootstrap default colors */
+        /* Switch Flat
+    ==========================*/
+    .cmn-toggle {
             position: absolute;
-            z-index: 2;
-            display: block;
-            width: 2.375rem;
-            height: 2.375rem;
-            line-height: 2.375rem;
-            text-align: center;
-            pointer-events: none;
-            color: #aaa;
+            margin-left: -9999px;
+            visibility: hidden;
         }
 
-        .table-style-custom {
-            position: fixed;
-            margin-top: 5%;
-            width: 80%;
-            height: 600px;
-            overflow-y: scroll;
+        .cmn-toggle+label {
+            display: block;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+            user-select: none;
+        }
+
+        input.cmn-toggle-round+label {
+            padding: 1px;
+            width: 25px;
+            height: 13px;
+            background-color: #dddddd;
+            border-radius: 35px;
+        }
+
+        input.cmn-toggle-round+label:before,
+        input.cmn-toggle-round+label:after {
+            display: block;
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            bottom: 1px;
+            content: "";
+        }
+
+        input.cmn-toggle-round+label:before {
+            right: 1px;
+            background-color: #f1f1f1;
+            border-radius: 25px;
+            transition: background 0.4s;
+        }
+
+        input.cmn-toggle-round+label:after {
+            width: 11px;
+            background-color: #fff;
+            border-radius: 100%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: margin 0.4s;
+        }
+
+        input.cmn-toggle-round:checked+label:before {
+            background-color: #279DF3;
+        }
+
+        input.cmn-toggle-round:checked+label:after {
+            margin-left: 12px;
         }
 
     </style>
 
-    <div>
+    <div class="">
         <div class="" style="margin-top:50px;">
-            <nav class="position-fixed col-md-12">
+            <nav class="">
                 <h3>Clientes de la plataforma</h3>
                 <form action="{{ url('dashboard/clients') }}">
-                    <div class="form-group has-search d-inline-block col-md-6">
+                    <div class="form-group has-search d-inline-block col-md-8">
                         <input type="text" class="form-control" placeholder="Buscar por correo del dueño" id="search"
                             name="search" value="{!! $search !!}" autocomplete="off" autofocus="on">
                     </div>
@@ -67,11 +132,11 @@
                 <table class="table table-striped table-bordered" style="table-layout: fixed;">
                     <thead>
 
-                        <th width="10%">Compañia</th>
-                        <th width="20%">Dueño</th>
+                        <th width="15%">Compañia</th>
+                        <th width="25%">Dueño</th>
                         <th width="15%">Fecha creación</th>
                         <th width="10%">Tipo de Cuenta</th>
-                        <th align="center" width="10%">Fase</th>
+                        <th align="center" width="15%">Fase</th>
                         <th align="center" width="10%">Estado</th>
                         <th width="10%">Acciones</th>
                     </thead>

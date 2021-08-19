@@ -8,6 +8,8 @@ use EmizorIpx\ClientFel\Utils\TypeParametrics;
 use EmizorIpx\PrepagoBags\Exceptions\PrepagoBagsException;
 use EmizorIpx\PrepagoBags\Models\AccountPrepagoBags;
 use EmizorIpx\PrepagoBags\Models\FelCompanyDocumentSector;
+use EmizorIpx\PrepagoBags\Models\PostpagoPlan;
+use EmizorIpx\PrepagoBags\Models\PostpagoPlanCompany;
 use EmizorIpx\PrepagoBags\Models\PrepagoBag;
 use EmizorIpx\PrepagoBags\Traits\RechargeBagsTrait;
 use Exception;
@@ -62,6 +64,7 @@ class AccountPrepagoBagService {
             else{
                 bitacora_info("AccountPrepagoBagService:addBagFree", "PrepagoBags gratis no encontrado");
             }
+            return $this;
         } catch (Exception $ex) {
             bitacora_error('AccountPrepagoBagService:addBagFree', $ex->getMessage());
         }
@@ -94,6 +97,28 @@ class AccountPrepagoBagService {
             bitacora_error('AccountPrepagoBagService:addAccount', $ex->getMessage());
         }
         
+    }
+
+    public function saveDuedateAndInvoiceAvailable( $duedate, $sectorDocuments ){
+
+        try{
+
+            foreach ($sectorDocuments as $key => $value){
+                FelCompanyDocumentSector::createOrUpdate([
+                    'fel_doc_sector_id' => $key,
+                    'invoice_number_available' => intval($value),
+                    'fel_company_id' => $this->fel_company->id,
+                    'duedate' => $duedate
+                ]);
+            }
+
+            return $this;
+
+        } catch(Exception $ex){
+            \Log::debug("Error al Registrar Duedate Company Sector Documents...". $ex);
+            bitacora_error('AccountPrepagoBagService:UpdateDuedateSectorDocuments', $ex->getMessage());
+        }
+
     }
 
 
@@ -136,6 +161,40 @@ class AccountPrepagoBagService {
         } catch(Exception $ex){
             \Log::debug("Error al Frequency startDate");
         }
+    }
+
+    public function savePostpagoPlan($plan_id, $enable_overflow, $start_date){
+
+        try{
+        $plan = PostpagoPlan::whereId($plan_id)->first();
+
+        PostpagoPlanCompany::create([
+            'name' => $plan->name,
+            'price' => $plan->price,
+            'num_invoices' => $plan->num_invoices,
+            'num_clients' => $plan->num_clients,
+            'num_products' => $plan->num_products,
+            'num_branches' => $plan->num_branches,
+            'num_users' => $plan->num_users,
+            'prorated_invoice' => $plan->prorated_invoice,
+            'prorated_clients' => $plan->prorated_clients,
+            'prorated_products' => $plan->prorated_products,
+            'prorated_branches' => $plan->prorated_branches,
+            'prorated_users' => $plan->prorated_users,
+            'frequency' => $plan->frequency,
+            'all_sector_docs' => $plan->all_sector_docs,
+            'enable_overflow' => $enable_overflow ?? $plan->enable_overflow,
+            'company_id' => $this->fel_company->company_id,
+            'start_date' => $start_date
+        ]);
+
+        return $this;
+
+    } catch(Exception $ex){
+        \Log::debug("Error to save postpago plan company...". $ex);
+    }
+
+
     }
 
     public function resetInvoiceAvailable(){
