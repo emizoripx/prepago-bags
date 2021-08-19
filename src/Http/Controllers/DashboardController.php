@@ -2,6 +2,7 @@
 
 namespace EmizorIpx\PrepagoBags\Http\Controllers;
 
+use EmizorIpx\ClientFel\Utils\TypeDocumentSector;
 use EmizorIpx\PrepagoBags\Http\Resources\CompanyDocumentSectorResource;
 use EmizorIpx\PrepagoBags\Models\AccountPrepagoBags;
 use EmizorIpx\PrepagoBags\Models\FelCompanyDocumentSector;
@@ -13,6 +14,11 @@ class DashboardController extends Controller
 
         $search = request('search' , "");
         $phase = request('phase' , "");
+
+        $user_hash = [ 'hash' => request()->header('user')];
+
+        \Log::debug("User Hash");
+        \Log::debug($user_hash);
 
         if ($phase != "Testing" && $phase != "Production") $phase == "";
 
@@ -33,7 +39,7 @@ class DashboardController extends Controller
                     ->paginate(30);
 
         
-        return view('prepagobags::ListClients', compact('clientsPrepago', "search", "phase"));
+        return view('prepagobags::ListClients', compact('clientsPrepago', "search", "phase", "user_hash"));
 
     }
 
@@ -62,8 +68,12 @@ class DashboardController extends Controller
                             ->where('fel_company.deleted_at', '=', null)
                             ->where('companies.id',$companyid)
                             ->first();
+        
+        $document_sectors = FelCompanyDocumentSector::whereCompanyId($companyid)->get([ 'fel_doc_sector_id']);
 
-        return view('prepagobags::components.modal2',["company" => $data]);
+
+
+        return view('prepagobags::components.modal2',["company" => $data, "document_sectors" => $document_sectors, "arrayNames" => TypeDocumentSector::ARRAY_NAMES]);
     }
 
     public function showInformation($companyId)
@@ -77,22 +87,39 @@ class DashboardController extends Controller
             ->orderBy('companies.id', 'desc')
             ->where('companies.id', $companyId)
             ->first();
-        $document_sectors = FelCompanyDocumentSector::whereFelCompanyId($companyId)->get(['invoice_number_available', 'accumulative', 'duedate', 'fel_doc_sector_id', 'counter']);
+        $document_sectors = FelCompanyDocumentSector::whereCompanyId($companyId)->get(['invoice_number_available', 'accumulative', 'duedate', 'fel_doc_sector_id', 'counter', 'postpago_limit','postpago_exceded_limit']);
 
         
         $branches_number = \DB::table('fel_branches')->whereCompanyId($companyId)->count();
         $arrayNames = [
             1 => "Factura compra venta",
+            2 => "Recibo de Alquiler de Bienes Inmuebles",
             3 => "Factura comercial de exportación",
+            4 => "Factura Comercial de Exportación en Libre Consignación",
+            5 => "Factura de Zona Franca",
+            6 => "Factura de Servicio Turístico y Hospedaje",
+            7 => "Factura de Comercialización de Alimentos – Seguridad ",
             8 => "Factura de tasa cero por venta de libros y transporte internacional de carga",
+            9 => "Factura de Compra y Venta de Moneda Extranjera ",
+            10 => "Factura Dutty Free",
             11 => "Factura sectores educativos",
+            12 => "Factura de Comercialización de Hidrocarburos",
             13 => "Servicios básicos",
+            14 => "Factura Productos Alcanzados por el ICE",
             15 => "Factura Entidades Financieras",
             16 => "Factura de hoteles",
+            17 => "Factura de Hospitales/Clínicas",
+            18 => "Factura de Juegos de Azar",
+            19 => "Factura Hidrocarburos",
             20 => "Factura de exportación de minerales",
             21 => "Factura de venta interna de minerales",
             22 => "Factura telecomunicaciones",
-            24 => "Nota débito crédito"
+            23 => "Factura Prevalorada",
+            24 => "Nota débito crédito",
+            25 => "Factura de Productos Nacionales",
+            26 => "Factura de Productos Nacionales - ICE",
+            27 => "Factura Regimen 7RG",
+            28 => "Factura Comercial de Exportación de Servicios"
         ];
 
         return view('prepagobags::components.information' , compact('company', 'document_sectors','arrayNames', 'branches_number') );

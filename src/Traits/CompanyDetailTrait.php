@@ -12,14 +12,6 @@ trait CompanyDetailTrait{
         return $this->hasOne(AccountPrepagoBags::class, 'company_id')->with('fel_branches','fel_company_document_sector', 'fel_company_token');
     }
 
-    public function includeCompanyDetail(){
-
-        $company = $this->company_detail->load('fel_branches', 'fel_company_document_sector');
-
-        return  new AccountDetailResource(collect($company));
-    }
-
-
     public function createFelCompany(){
 
         AccountPrepagoBags::create([

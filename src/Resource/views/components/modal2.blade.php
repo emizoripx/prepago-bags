@@ -41,6 +41,31 @@
                      </label>
                  </div>
 
+                 <div class="mt-4" name="docSector" id="docSector">
+                    <div class="form-group">
+                        <label for="client_id">Frecuencia</label>
+                        <input type="number" class="form-control" id="frequency" name="frequency" placeholder="Frequencia en meses" autocomplete="off">
+                    </div>
+                     <table class="table" >
+                         <thead>
+                             <th>Documento Sector</th>
+                             <th>Limite</th>
+                         </thead>
+                         <tbody>
+                             @foreach ($document_sectors as $ds)
+                                 <tr>
+                                     <td>{!! $arrayNames[$ds->fel_doc_sector_id] !!}</td>
+                                     <td class="form-group">
+                                         <input class="form-control" type="number" id="postpago_limit[{{ $ds->fel_doc_sector_id }}]" name="postpago_limit[{{ $ds->fel_doc_sector_id }}]">
+                                     </td>
+                                 </tr>
+                             @endforeach
+
+                         </tbody>
+                     </table>
+                 </div>
+
+
              </div>
              <div class="modal-footer">
                  <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
@@ -49,3 +74,18 @@
      </form>
  </div>
  </div>
+
+ <script>
+     $(document).ready(function(){
+        $("#docSector").hide();
+
+        $("#exampleRadios1").click(function (){
+            console.log("Changed")
+                $("#docSector").hide();
+        });
+        $("#exampleRadios2").click(function (){
+            console.log("Changed")
+                $("#docSector").show();
+        });
+    });
+ </script>

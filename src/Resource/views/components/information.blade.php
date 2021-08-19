@@ -24,6 +24,8 @@
                          <th>Fact. disponible</th>
                          <th>Fact. emitidas</th>
                          <th>fecha vencimiento</th>
+                         <th>Limite Postpago</th>
+                         <th>Excedente</th>
                      </thead>
                      <tbody>
                      @foreach ($document_sectors as $ds)
@@ -33,6 +35,8 @@
                                 <td>{!! $ds->invoice_number_available !!}</td>
                                 <td>{!! $ds->counter !!}</td>
                                 <td>{!! $ds->duedate !!}</td>
+                                <td>{!! $ds->postpago_limit !!}</td>
+                                <td>{!! $ds->postpago_exceded_limit !!}</td>
                             </tr>
                             @endforeach
                         </tbody>

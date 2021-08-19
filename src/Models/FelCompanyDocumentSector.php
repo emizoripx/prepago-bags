@@ -14,7 +14,7 @@ class FelCompanyDocumentSector extends Model
 
     protected $table = 'fel_company_document_sectors';
 
-    protected $fillable = ['id', 'invoice_number_available', 'accumulative','duedate', 'company_id', 'fel_company_id', 'fel_doc_sector_id', 'counter'];
+    protected $fillable = ['id', 'invoice_number_available', 'accumulative','duedate', 'company_id', 'fel_company_id', 'fel_doc_sector_id', 'counter', 'postpago_limit', 'postpago_exceded_limit'];
 
     
     public static function createOrUpdate( $data ){
@@ -79,13 +79,43 @@ class FelCompanyDocumentSector extends Model
         return $this;
     }
     public function setPostpagoCounter($sign = 1){
-        $this->postpago_counter = $this->postpago_counter + (1 * $sign);
+        
+
+        $data_postpago_limit = Carbon::parse($this->start_date)->addMonths($this->frequency);
+        $current_date = Carbon::now()->toDateString();
+
+        if( $current_date > $data_postpago_limit){
+            if($this->postpago_limit < $this->postpago_counter && $this->postpago_limit != -1){
+                $postpago_exceded_limit = $this->postpago_exceded_limit + ($this->postpago_counter - $this->postpago_limit);
+
+                $this->postpago_exceded_limit = $postpago_exceded_limit;
+            }
+
+            $this->start_date = Carbon::now()->toDateString();
+
+            $this->postpago_counter = 0;
+
+        } else{
+            $this->postpago_counter = $this->postpago_counter + (1 * $sign);
+        }
+
         \Log::debug("#Cantidad facturas hechas :" . $this->counter);
         return $this;
     }
 
     public static function getCompanyDocumentSectorByCode($fel_company_id, $sector_document_code){
         return self::where('fel_company_id', $fel_company_id)->where('fel_doc_sector_id', $sector_document_code)->first();
+    }
+
+    public static function resetInvoiceAvailable($company_id){
+        return self::where('company_id', $company_id)->update([
+            "invoice_number_available" => 0
+        ]);
+    }
+    public static function resetCounter($company_id){
+        return self::where('company_id', $company_id)->update([
+            "counter" => 0
+        ]);
     }
 
 }
