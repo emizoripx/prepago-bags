@@ -37,9 +37,8 @@ class CheckCompanyPostpago implements ShouldQueue
 
         \Log::debug("Companies to Check");
 
-        
 
-        PostpagoPlanCompany::whereRaw(DB::raw('CURRENT_DATE() > DATE_ADD(start_date, INTERVAL frequency MONTH)'))->cursor( function ($company_plan){
+        PostpagoPlanCompany::whereRaw('CURRENT_DATE() > DATE_ADD(start_date, INTERVAL frequency MONTH)')->cursor()->each( function ($company_plan){
             // $postpago_plan = PostpagoPlanCompany::where('company_id', $company_id)->first();
             \Log::debug("Company");
             $postpago_plan_service = $company_plan->service();
