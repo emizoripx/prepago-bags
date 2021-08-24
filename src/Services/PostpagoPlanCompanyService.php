@@ -82,4 +82,10 @@ class PostpagoPlanCompanyService {
         ]);
     }
 
+    public static function getPostpagoPlan($company_id){
+        $plan = PostpagoPlanCompany::where('company_id', $company_id)->first();
+
+        return $plan;
+    }
+
 }
