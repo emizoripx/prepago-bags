@@ -8,6 +8,7 @@ use EmizorIpx\PrepagoBags\Models\AccountPrepagoBags;
 use EmizorIpx\PrepagoBags\Models\FelCompanyDocumentSector;
 use EmizorIpx\PrepagoBags\Models\PostpagoPlan;
 use Illuminate\Routing\Controller;
+use DB;
 
 class DashboardController extends Controller
 {
@@ -122,5 +123,28 @@ class DashboardController extends Controller
         ];
 
         return view('prepagobags::components.information' , compact('company', 'document_sectors','arrayNames', 'branches_number') );
+    }
+
+    public function showFormLikend($company_id){
+        $company = AccountPrepagoBags::join('companies', 'fel_company.company_id', '=', 'companies.id')
+                    ->select(
+                        'companies.id', 
+                        'fel_company.company_id',
+                        'fel_company.client_id',
+                        'fel_company.production', 
+                        'companies.settings'
+                        )
+                    ->where('fel_company.deleted_at', '=', null)
+                    ->where('companies.id',$company_id)
+                    ->first();
+        
+        $clients = DB::table('fel_clients')
+                        ->join('clients', 'fel_clients.id_origin', '=', 'clients.id')
+                        ->leftJoin('fel_company', 'clients.id', '=', 'fel_company.client_id')
+                        ->where('fel_clients.company_id', config('prepagobag.company_admin_id'))
+                        ->whereNull('fel_company.client_id')
+                        ->pluck('fel_clients.business_name', 'clients.id');
+        
+        return view('prepagobags::components.linkedModal', compact('company', 'clients'));
     }
 }

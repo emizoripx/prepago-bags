@@ -3,10 +3,6 @@
 @section('content')
     <style>
         
-        label {
-            font-size: 10px;
-        }
-        
         label.btn {
             font-size: 10px !important;
             text-transform: uppercase !important;
@@ -22,6 +18,17 @@
         table#tbl_detalle td{
             font-size: 12px;
         }
+
+        label {
+            font-size: 10px;
+        }
+
+        .alert {
+            font-size: 10px !important;
+            padding: 2px;
+            display: block;
+        }
+        
         /*
         *
         * ==========================================
@@ -181,6 +188,17 @@
                                             <a class="dropdown-item" data-type="actions-dashboard"
                                                 data-href="{{ URL::to('dashboard/form-information/' . $client->company_id) }}"
                                                 data-container=".action-modal">Información</a>
+
+                                            @if ($client->production == 0 || $client->company_id == env('COMPANY_ADMIN'))
+                                                <a class="dropdown-item disabled" href="#">Vincular/Desvincular</a>
+                                            @else
+
+                                                <a class="dropdown-item" data-type="actions-dashboard"
+                                                    data-href="{{ URL::to('dashboard/form-linked/' . $client->company_id) }}"
+                                                    data-container=".action-modal">Vincular/Desvincular</a>
+
+                                            @endif
+
                                         </div>
                                     </div>
                                 </td>
@@ -203,7 +221,7 @@
         });
         //On display of add contact modal
         $('.action-modal').on('show.bs.modal', function(e) {
-
+            $('#company_client_id').selectpicker();
             var modal = $(this);
 
             $('form#actionFormLabel')
@@ -247,12 +265,28 @@
                             success: function(result) {
                                 if (result.success == true) {
                                     $('div.action-modal').modal('hide');
-                                    // alert("Se paso a pruebas piloto exitosamente");
+                                    alert("Cliente Vinculado Satisfactoriamente");
                                     location.reload();
                                 } else {
                                     alert(result.msg);
                                 }
                             },
+                            error: function(response) {
+                                $.each(response.responseJSON.errors, function(field_name,
+                                error) {
+                                    $(document).find('[name=' + field_name + ']').after(
+                                        '<span class="alert alert-danger">' +
+                                        error + '</span>');
+                                })
+
+                                if(response.success == false){
+                                    alert(result.msg);
+                                }
+
+                                $(form)
+                                .find('button[type="submit"]')
+                                .attr('disabled', false);
+                            }
                         });
                     },
                 });
