@@ -5,6 +5,7 @@ namespace EmizorIpx\PrepagoBags\Http\Resources;
 use App\Utils\Traits\MakesHash;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use EmizorIpx\ClientFel\Http\Resources\BranchResource;
+use EmizorIpx\PrepagoBags\Services\PostpagoPlanCompanyService;
 
 class AccountDetailResource extends ResourceCollection
 {
@@ -31,7 +32,8 @@ class AccountDetailResource extends ResourceCollection
             "client_secret" => substr_replace($this->resource['fel_company_token']['client_secret'],'***************', 5, -20),
             "settings_integration" => json_decode($this->resource['settings']),
             "branches" => BranchResource::collection($this->resource['fel_branches']),
-            "document_sector_detail" => CompanyDocumentSectorResource::collection($this->resource['fel_company_document_sector'])
+            "document_sector_detail" => CompanyDocumentSectorResource::collection($this->resource['fel_company_document_sector']),
+            "postpago_plan" => ($post_pago_company = PostpagoPlanCompanyService::getPostpagoPlan($this->resource['company_id'])) ? new PostpagoPlanCompanyResource($post_pago_company ):null,
         ];
     }
 }
