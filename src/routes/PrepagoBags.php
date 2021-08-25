@@ -46,11 +46,14 @@ class PrepagoBags {
                 Route::put('dashboard/postpago-plans/{id}', 'PostpagoPlanController@update')->name('postpago.update');
                 Route::get('dashboard/postpago-plans/publish/{id}', 'PostpagoPlanController@publishPlan')->name('postpago.publish');
                 Route::get('dashboard/postpago-plans-to-select', 'PostpagoPlanController@getPostpagoPlans')->name('postpago.getPostpagoPlans');
+
+                Route::post('dashboard/linked-client', 'CompanyAccountController@linkedClient')->name('dashboard.linkedClient');
                 
             });
             Route::get('dashboard/form-phase-piloto/{company_id}', 'DashboardController@showForm');
             Route::get('dashboard/form-phase-production/{company_id}', 'DashboardController@showForm2');
             Route::get('dashboard/form-information/{company_id}', 'DashboardController@showInformation');
+            Route::get('dashboard/form-linked/{company_id}', 'DashboardController@showFormLikend');
             Route::get('dashboard/form-edit-plans/{plan_id}', 'PostpagoPlanController@formEdit');
             Route::get('dashboard/form-create-plans', 'PostpagoPlanController@formCreate');
             

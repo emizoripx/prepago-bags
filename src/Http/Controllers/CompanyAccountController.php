@@ -8,6 +8,7 @@ use App\Models\User;
 use EmizorIpx\ClientFel\Exceptions\ClientFelException;
 use EmizorIpx\ClientFel\Repository\FelCredentialRepository;
 use EmizorIpx\PrepagoBags\Exceptions\PrepagoBagsException;
+use EmizorIpx\PrepagoBags\Http\Requests\StoreLinkedClientRequest;
 use EmizorIpx\PrepagoBags\Models\AccountPrepagoBags;
 use EmizorIpx\PrepagoBags\Services\AccountPrepagoBagService;
 use EmizorIpx\PrepagoBags\Services\PurgeCompanyDataService;
@@ -226,5 +227,28 @@ class CompanyAccountController extends Controller
                 'msg' => $e->getMessage()
             ]);
         }
+    }
+
+    public function linkedClient(StoreLinkedClientRequest $request){
+
+        try{
+
+            $data = $request->all();
+
+            AccountPrepagoBags::where('company_id', $data['company_id'])->update([
+                'client_id' => $data['company_client_id']
+            ]);
+
+            return response()->json([
+                'success' => true
+            ]);
+
+        } catch(Exception $ex){
+            return response()->json([
+                'success' => false,
+                'msg' => $ex->getMessage()
+            ]);
+        }
+
     }
 }
