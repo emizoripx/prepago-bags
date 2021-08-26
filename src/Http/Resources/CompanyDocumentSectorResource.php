@@ -21,6 +21,7 @@ class CompanyDocumentSectorResource extends JsonResource
         return [
             "id" => $this->resource['id'],
             "invoice_number_available" => $this->resource['invoice_number_available'],
+            "postpago_counter" => $this->resource['postpago_counter'],
             "document_sector" => TypeDocumentSector::getName($this->resource['fel_doc_sector_id']),
             "acumulative" => $this->resource['accumulative'],
             "duedate" => $this->resource['duedate'],
