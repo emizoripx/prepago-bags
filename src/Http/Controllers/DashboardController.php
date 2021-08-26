@@ -9,6 +9,7 @@ use EmizorIpx\PrepagoBags\Models\FelCompanyDocumentSector;
 use EmizorIpx\PrepagoBags\Models\PostpagoPlan;
 use Illuminate\Routing\Controller;
 use DB;
+use EmizorIpx\PrepagoBags\Models\PostpagoPlanCompany;
 
 class DashboardController extends Controller
 {
@@ -78,19 +79,42 @@ class DashboardController extends Controller
 
     public function showInformation($companyId)
     {
-        $company = AccountPrepagoBags::join('company_user', 'company_user.company_id', '=', 'fel_company.company_id')
-        ->join('companies', 'fel_company.company_id', '=', 'companies.id')
-        ->Join('users', 'users.id', '=', 'company_user.user_id')
-        ->select('companies.id', 'fel_company.company_id', 'companies.settings', 'fel_company.production', 'fel_company.is_postpago', 'fel_company.enabled', 'fel_company.phase', 'users.email', 'companies.created_at')
-        ->where('fel_company.deleted_at', '=', null)
-            ->where('company_user.is_owner', 1)
-            ->orderBy('companies.id', 'desc')
+        $company = AccountPrepagoBags::join('companies', 'fel_company.company_id', '=', 'companies.id')
+        ->select(
+            'companies.id',
+            'fel_company.company_id',
+            'fel_company.client_id',
+            'fel_company.production',
+            'fel_company.is_postpago',
+            'companies.settings'
+        )
+            ->where('fel_company.deleted_at', '=', null)
             ->where('companies.id', $companyId)
             ->first();
-        $document_sectors = FelCompanyDocumentSector::whereCompanyId($companyId)->get(['invoice_number_available', 'accumulative', 'duedate', 'fel_doc_sector_id', 'counter', 'postpago_limit','postpago_exceded_limit']);
 
-        
-        $branches_number = \DB::table('fel_branches')->whereCompanyId($companyId)->count();
+        $document_sectors = FelCompanyDocumentSector::whereCompanyId($companyId)->get(['invoice_number_available', 'accumulative', 'duedate', 'fel_doc_sector_id', 'counter', 'postpago_limit','postpago_exceded_limit','postpago_counter']);
+
+        $sum_all_documents = 0;
+        $sum_all_clients = 0;
+        $sum_all_products = 0;
+        $sum_all_branches = 0;
+        $sum_all_users = 0;
+
+        $post_pago_plan_companies = [];
+        $due_invoices = [];
+
+        if ($company->is_postpago) {
+            $sum_all_documents = collect($document_sectors)->sum("postpago_counter");
+            $sum_all_clients = DB::table('clients')->whereNull('deleted_at')->whereCompanyId($companyId)->count();    
+            $sum_all_products = DB::table('products')->whereNull('deleted_at')->whereCompanyId($companyId)->count();    
+            $sum_all_branches = DB::table('fel_branches')->whereCompanyId($companyId)->count();    
+            $sum_all_users = DB::table('company_user')->whereNull('deleted_at')->whereCompanyId($companyId)->count();    
+            
+            $post_pago_plan_companies = PostpagoPlanCompany::whereCompanyId($companyId)->first();
+            $due_invoices = DB::table('invoices')->whereClientId($company->client_id)->where('balance','>',0)->get(['number','date','balance']);
+
+        }
+
         $arrayNames = [
             1 => "Factura compra venta",
             2 => "Recibo de Alquiler de Bienes Inmuebles",
@@ -122,7 +146,7 @@ class DashboardController extends Controller
             28 => "Factura Comercial de Exportación de Servicios"
         ];
 
-        return view('prepagobags::components.information' , compact('company', 'document_sectors','arrayNames', 'branches_number') );
+        return view('prepagobags::components.information' , compact('company', 'document_sectors','arrayNames', 'post_pago_plan_companies', 'sum_all_documents','sum_all_clients','sum_all_products','sum_all_branches','sum_all_users','due_invoices') );
     }
 
     public function showFormLikend($company_id){
