@@ -4,6 +4,7 @@ namespace EmizorIpx\PrepagoBags\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Utils\Traits\MakesHash;
 use Carbon\Carbon;
+use EmizorIpx\PrepagoBags\Services\PrepagoBagsPaymentService;
 
 class PrepagoBagsPayment extends Model
 {
@@ -40,6 +41,10 @@ class PrepagoBagsPayment extends Model
 
     public function company()
     {
-        return $this->hasOne(AccountPrepagoBags::class,"id","company_id"); 
+        return $this->hasOne(AccountPrepagoBags::class,"company_id","company_id"); 
+    }
+
+    public function service(){
+        return new PrepagoBagsPaymentService($this);
     }
 }

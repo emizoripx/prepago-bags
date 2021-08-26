@@ -7,6 +7,7 @@ use EmizorIpx\PrepagoBags\Models\PostpagoPlan;
 use EmizorIpx\PrepagoBags\Models\PostpagoPlanCompany;
 use Exception;
 use DB;
+use EmizorIpx\PrepagoBags\Http\Resources\PostpagoPlanCompanyResource;
 use Hashids\Hashids;
 use Illuminate\Support\Facades\Log;
 
@@ -85,7 +86,11 @@ class PostpagoPlanCompanyService {
     public static function getPostpagoPlan($company_id){
         $plan = PostpagoPlanCompany::where('company_id', $company_id)->first();
 
-        return $plan;
+        if(!$plan){
+            return null;
+        }
+
+        return new PostpagoPlanCompanyResource($plan);
     }
 
 }
