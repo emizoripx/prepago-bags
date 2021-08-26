@@ -36,7 +36,7 @@ class PostpagoPlanCompanyResource extends JsonResource
             "sector_doc_id" => $this->sector_doc_id,
             "enable_overflow" => boolval($this->enable_overflow),
             "company_id" => $this->company_id,
-            "start_date" => strtotime($this->start_date),
+            "start_date" => $this->start_date,
             "postpago_exceded_amount" => $this->postpago_exceded_amount,
             "created_at" => strtotime($this->created_at),
         ];
