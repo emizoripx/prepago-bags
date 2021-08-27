@@ -10,6 +10,7 @@ use EmizorIpx\PrepagoBags\Models\PostpagoPlan;
 use Illuminate\Routing\Controller;
 use DB;
 use EmizorIpx\PrepagoBags\Models\PostpagoPlanCompany;
+use EmizorIpx\PrepagoBags\Models\PrepagoBagsPayment;
 
 class DashboardController extends Controller
 {
@@ -37,7 +38,7 @@ class DashboardController extends Controller
                     ->when($phase, function ($query, $phase) {
                         return $query->where('fel_company.phase', $phase);
                     })
-                    ->paginate(30);
+                    ->paginate(15);
 
         
         return view('prepagobags::ListClients', compact('clientsPrepago', "search", "phase", "user_hash"));
@@ -94,6 +95,13 @@ class DashboardController extends Controller
 
         $document_sectors = FelCompanyDocumentSector::whereCompanyId($companyId)->get(['invoice_number_available', 'accumulative', 'duedate', 'fel_doc_sector_id', 'counter', 'postpago_limit','postpago_exceded_limit','postpago_counter']);
 
+        $prepago_bags_payments = PrepagoBagsPayment::join('prepago_bags','prepago_bags.id','=','prepago_bags_payments.prepago_bag_id')
+                                                    ->where('prepago_bags_payments.company_id',$companyId)
+                                                    ->where('prepago_bags_payments.status_code','!=',-1)
+                                                    ->groupBy('sector_document_type_code')
+                                                    ->select(DB::raw('sector_document_type_code,max(prepago_bags_payments.paid_on) as purchase_last_date'))
+                                                    ->pluck('purchase_last_date','sector_document_type_code');
+        
         $sum_all_documents = 0;
         $sum_all_clients = 0;
         $sum_all_products = 0;
@@ -146,7 +154,7 @@ class DashboardController extends Controller
             28 => "Factura Comercial de Exportación de Servicios"
         ];
 
-        return view('prepagobags::components.information' , compact('company', 'document_sectors','arrayNames', 'post_pago_plan_companies', 'sum_all_documents','sum_all_clients','sum_all_products','sum_all_branches','sum_all_users','due_invoices') );
+        return view('prepagobags::components.information' , compact('company', 'document_sectors','arrayNames', 'post_pago_plan_companies', 'sum_all_documents','sum_all_clients','sum_all_products','sum_all_branches','sum_all_users','due_invoices', 'prepago_bags_payments') );
     }
 
     public function showFormLikend($company_id){

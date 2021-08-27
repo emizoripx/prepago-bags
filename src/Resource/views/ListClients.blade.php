@@ -45,12 +45,26 @@
         margin-left: 10%;
         text-align: center;
     }
-    .modal-information p{
+
+    .modal-information p {
         margin-bottom: 0;
     }
-    .modal-information label{
+
+    .modal-information label {
         margin-bottom: 0;
     }
+
+    .table-prepago-invoices thead {
+
+        font-size: 12px;
+        font-weight: bold;
+
+    }
+
+    .table-prepago-invoices tbody {
+        font-size: 13px;
+    }
+
     /*
         *
         * ==========================================
@@ -115,14 +129,19 @@
     input.cmn-toggle-round:checked+label:after {
         margin-left: 12px;
     }
+
+
+
+
+
 </style>
 
 <div class="">
     <div class="" style="margin-top:50px;">
-        <nav class="">
-            <h3>Clientes de la plataforma</h3>
+        <nav class="navbar custom-search">
+
             <form action="{{ url('dashboard/clients') }}">
-                <div class="form-group has-search d-inline-block col-md-8">
+                <div class="form-group has-search d-inline-block col-md-4">
                     <input type="text" class="form-control" placeholder="Buscar por correo del dueño" id="search" name="search" value="{!! $search !!}" autocomplete="off" autofocus="on">
                 </div>
                 <div class="form-group d-inline-block">
@@ -153,19 +172,33 @@
                 <div class="form-group d-inline-block">
                     <button type="submit" class="btn form-control btn-primary d-inline-block"> Filtrar</button>
                 </div>
+                <div class="form-group d-inline-block" style="float:right">
+                    {{ $clientsPrepago->withQueryString()->links() }}
+                </div>
+
             </form>
         </nav>
         <div class="table-style-custom col-md-12">
-            <table class="table table-striped table-bordered" style="table-layout: fixed;">
+            <table class="table table-striped" style="border:1px #dee2e6 solid;table-layout: fixed;">
                 <thead>
 
-                    <th width="15%">Compañia</th>
-                    <th width="25%">Dueño</th>
-                    <th width="15%">Fecha creación</th>
-                    <th width="10%">Tipo de Cuenta</th>
-                    <th align="center" width="15%">Fase</th>
-                    <th align="center" width="10%">Estado</th>
-                    <th width="10%">Acciones</th>
+                    <th width="15%">COMPAÑIA</th>
+                    <th width="25%">DUEÑO</th>
+                    <th width="10%">CREADO</th>
+                    <th width="10%">TIPO</th>
+                    <th width="8%">FASE</th>
+                    <th width="7%">ESTADO</th>
+                    <th width="5%"></th>
+                </thead>
+                <thead>
+
+                    <th width="15%">COMPAÑIA</th>
+                    <th width="25%">DUEÑO</th>
+                    <th width="10%">CREADO</th>
+                    <th width="10%">TIPO</th>
+                    <th width="8%">FASE</th>
+                    <th width="7%">ESTADO</th>
+                    <th width="5%"></th>
                 </thead>
                 <tbody>
                     @foreach ($clientsPrepago as $client)
@@ -173,15 +206,17 @@
 
                         <td>{{ json_decode($client->settings)->name }}</td>
                         <td>{{ $client->email }}</td>
-                        <td>{{ $client->created_at }}</td>
-                        <td align="center">{!! $client->account_type_badge !!}</td>
-                        <td align="center">{!! $client->phase !!}</td>
-                        <td align="center">{{ $client->enabled == 'active' ? 'Activo' : 'Suspendido' }}</td>
-                        <td align="center">
-                            <div class="dropdown">
-                                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Acciones
-                                </button>
+                        <td>{{ $client->created_at->diffForHumans() }}</td>
+                        <td>{!! $client->account_type_badge !!}</td>
+                        <td>{!! $client->phase !!}</td>
+                        <td>{{ $client->enabled == 'active' ? 'Activo' : 'Suspendido' }}</td>
+                        <td>
+                            <div class="dropdown dropleft">
+                                <a class="dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                                    </svg>
+                                </a>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                     @if ($client->phase == 'Testing')
                                     <a class="dropdown-item" data-type="actions-dashboard" data-href="{{ URL::to('dashboard/form-phase-piloto/' . $client->company_id) }}" data-container=".action-modal">Pasar a pruebas piloto</a>
@@ -213,7 +248,6 @@
                     @endforeach
                 </tbody>
             </table>
-            {{ $clientsPrepago->withQueryString()->links() }}
         </div>
     </div>
     <div class="modal fade action-modal" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel"></div>

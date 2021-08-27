@@ -24,7 +24,7 @@ class PostpagoPlanController extends Controller
         $postpago_plans = PostpagoPlan::when($search, function ($query, $search) {
                             return $query->where('name','like', "%".$search."%");
                         })
-                        ->paginate(30);
+                        ->paginate(15);
         $document_sectors = TypeDocumentSector::ARRAY_NAMES;
 
         return view('prepagobags::ListPlanes', compact('postpago_plans', 'search','document_sectors'));

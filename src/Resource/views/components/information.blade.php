@@ -37,6 +37,9 @@
                 </div>
                 <hr>
                 @if($company->is_postpago == 1)
+
+                @if(!empty($post_pago_plan_companies))
+
                 <div class="row col-md-12">
                     <div class="form-group  col-md-3">
                         <label for="name">Plan Postpago</label>
@@ -136,14 +139,49 @@
                     </div>
                     @endif
                 </div>
+                @else
+                No se tiene un plan postpago seleccionado
+                @endif
 
                 @else
+                <div class="form-group  col-md-3">
+                    <label for="name">Documentos Sector</label>
+                    <p>{!! sizeof($document_sectors) !!}</p>
+                </div>
+                <div class="row col-md-12">
+                    <div class="table-prepago-invoices">
+
+                        <table class="table table-sm table-striped" border="1" style="        max-width: 100%; margin-left: 3%;">
+                            <thead>
+                                <tr>
+                                    <td>#</td>
+                                    <td>NOMBRE DOCUMENTO</td>
+                                    <td>DISPONIBLES</td>
+                                    <td>ÚLTIMA BOLSA COMPRADA</td>
+                                    <td>EMITIDAS</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($document_sectors as $di)
+                                <tr>
+                                    <td>{!! $di->fel_doc_sector_id !!}</td>
+                                    <td>{!! $arrayNames[$di->fel_doc_sector_id] !!}</td>
+                                    <td>{!! $di->invoice_number_available !!}</td>
+                                    <td>{!! isset($prepago_bags_payments[$di->fel_doc_sector_id]) ? $prepago_bags_payments[$di->fel_doc_sector_id]: "--" !!}</td>
+                                    <td>{!! $di->counter !!}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
 
                 @endif
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-success">Ejecutar</button>
+                <button type="button" class="btn btn-success" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </form>
