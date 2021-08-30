@@ -226,9 +226,9 @@
                                     @endif
                                     @if ($client->is_postpago)
                                     @if ($client->enabled == 'active')
-                                    <a class="dropdown-item disabled" href="#">Suspender</a>
+                                    <a class="dropdown-item" data-type="actions-dashboard" data-href="{{ URL::to('dashboard/form-suspend/'. $client->company_id) }}" data-container=".action-modal">Suspender</a>
                                     @else
-                                    <a class="dropdown-item disabled" data-type="data-action" data-onclick="enablePostpago( $client->company_id )">Habilitar</a>
+                                    <a class="dropdown-item" data-type="actions-dashboard" data-href="{{ URL::to('dashboard/form-up/'. $client->company_id) }}" data-container=".action-modal">Habilitar</a>
                                     @endif
                                     @endif
                                     <a class="dropdown-item" data-type="actions-dashboard" data-href="{{ URL::to('dashboard/form-information/' . $client->company_id) }}" data-container=".action-modal">Información</a>

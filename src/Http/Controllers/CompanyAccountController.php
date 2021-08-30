@@ -9,6 +9,8 @@ use EmizorIpx\ClientFel\Exceptions\ClientFelException;
 use EmizorIpx\ClientFel\Repository\FelCredentialRepository;
 use EmizorIpx\PrepagoBags\Exceptions\PrepagoBagsException;
 use EmizorIpx\PrepagoBags\Http\Requests\StoreLinkedClientRequest;
+use EmizorIpx\PrepagoBags\Http\Requests\SuspendClientRequest;
+use EmizorIpx\PrepagoBags\Http\Requests\UpClientRequest;
 use EmizorIpx\PrepagoBags\Models\AccountPrepagoBags;
 use EmizorIpx\PrepagoBags\Services\AccountPrepagoBagService;
 use EmizorIpx\PrepagoBags\Services\PurgeCompanyDataService;
@@ -250,5 +252,48 @@ class CompanyAccountController extends Controller
             ]);
         }
 
+    }
+
+    public function suspendClient(SuspendClientRequest $request){
+
+        try{
+            $data = $request->all();
+
+            AccountPrepagoBags::where('company_id', $data['company_id'])->update([
+                'enabled' => 'inactive'
+            ]);
+
+            return response()->json([
+                'success' => true
+            ]);
+
+        } catch(Exception $ex){
+            return response()->json([
+                'success' => false,
+                'msg' => $ex->getMessage()
+            ]);
+        }
+
+    }
+
+    public function upClient( UpClientRequest $request ){
+        try{
+            $data = $request->all();
+
+            AccountPrepagoBags::where('company_id', $data['company_id'])->update([
+                'enabled' => 'active'
+            ]);
+
+            return response()->json([
+                'success' => true
+            ]);
+
+
+        } catch (Exception $ex){
+            return response()->json([
+                'success' => false,
+                'msg' => $ex->getMessage()
+            ]);
+        }
     }
 }
