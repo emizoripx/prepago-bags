@@ -179,4 +179,31 @@ class DashboardController extends Controller
         
         return view('prepagobags::components.linkedModal', compact('company', 'clients'));
     }
+
+    public function showFormSuspend($company_id){
+        $company = AccountPrepagoBags::join('companies', 'fel_company.company_id', '=', 'companies.id')
+                    ->select(
+                        'companies.id', 
+                        'fel_company.company_id',
+                        'fel_company.enabled',
+                        'companies.settings'
+                        )
+                    ->where('fel_company.deleted_at', '=', null)
+                    ->where('companies.id',$company_id)
+                    ->first();
+        return view('prepagobags::components.suspendModal', compact('company'));
+    }
+    public function showFormUp($company_id){
+        $company = AccountPrepagoBags::join('companies', 'fel_company.company_id', '=', 'companies.id')
+                    ->select(
+                        'companies.id', 
+                        'fel_company.company_id',
+                        'fel_company.enabled',
+                        'companies.settings'
+                        )
+                    ->where('fel_company.deleted_at', '=', null)
+                    ->where('companies.id',$company_id)
+                    ->first();
+        return view('prepagobags::components.upClientModal', compact('company'));
+    }
 }
