@@ -4,11 +4,13 @@ namespace EmizorIpx\PrepagoBags;
 
 use App\Models\Account;
 use App\Models\Company;
+use EmizorIpx\PrepagoBags\Http\Middleware\VerifyAccountEnabled;
 use EmizorIpx\PrepagoBags\Observers\AccountObserver;
 use EmizorIpx\PrepagoBags\Services\AccountPrepagoBagService;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Routing\Router;
 class PrepagoBagsServiceProvider extends ServiceProvider
 {
     /**
@@ -47,5 +49,12 @@ class PrepagoBagsServiceProvider extends ServiceProvider
 
         // VISTAS
         $this->loadViewsFrom(__DIR__.'/Resource/views', 'prepagobags');
+
+
+        # Middleware
+        
+        $router = $this->app->make(Router::class);
+
+        $router->aliasMiddleware('verify_account', VerifyAccountEnabled::class);
     }
 }
