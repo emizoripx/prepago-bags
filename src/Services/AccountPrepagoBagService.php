@@ -234,9 +234,14 @@ class AccountPrepagoBagService {
     public static function changeToPostpagoAccount ($company_id){
 
         try{
-            AccountPrepagoBags::where('company_id', $company_id)->update([
+            
+            $fel_company = AccountPrepagoBags::where('company_id', $company_id)->first(); 
+            $fel_company->update([
                 'is_postpago' => true
             ]);
+
+            return $fel_company;
+
         } catch (Exception $ex){
             \Log::debug("Error to change company to postpago plan...". $ex);
         }

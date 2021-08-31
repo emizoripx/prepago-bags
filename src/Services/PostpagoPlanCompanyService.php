@@ -93,4 +93,86 @@ class PostpagoPlanCompanyService {
         return new PostpagoPlanCompanyResource($plan);
     }
 
+    public function verifyLimitProducts($products_counter){
+
+        if($this->postpago_plan->num_products == 0){
+            return false;
+        }
+
+        return  $products_counter >= $this->postpago_plan->num_products;
+    }
+    public function verifyLimitClients($clients_counter){
+
+        if($this->postpago_plan->num_clients == 0){
+            return false;
+        }
+
+        return  $clients_counter >= $this->postpago_plan->num_clients;
+    }
+    public function verifyLimitUsers($users_counter){
+
+        if($this->postpago_plan->num_users == 0){
+            return false;
+        }
+
+        return $users_counter >= $this->postpago_plan->num_users ;
+    }
+
+    public function verifyLimitBranches($branches_counter){
+
+        if($this->postpago_plan->num_branches == 0){
+            return false;
+        }
+
+        return  $branches_counter >= $this->postpago_plan->num_branches;
+    }
+
+    public function processExcededProducts( $counter_products ){
+
+        $exceded = $this->postpago_plan->num_products - $counter_products;
+
+        if( $this->postpago_plan->num_products != 0 && $exceded < 0){
+            $excededAmount = $this->postpago_plan->prorated_products * abs($exceded);
+            \Log::debug("Productos excedentes:  ". $exceded);
+            \Log::debug("Monto excedentes:  ". $excededAmount);
+    
+            $this->postpago_plan->update([
+                'postpago_exceded_amount' => $this->postpago_plan->postpago_exceded_amount + $excededAmount
+            ]);
+        }
+
+    }
+
+    public function processExcededClients( $counter_clients ){
+
+        $exceded = $this->postpago_plan->num_clients - $counter_clients;
+
+        if( $this->postpago_plan->num_clients != 0 && $exceded < 0){
+            $excededAmount = $this->postpago_plan->prorated_clients * abs($exceded);
+            \Log::debug("Clientes excedentes:  ". $exceded);
+            \Log::debug("Monto excedentes:  ". $excededAmount);
+    
+            $this->postpago_plan->update([
+                'postpago_exceded_amount' => $this->postpago_plan->postpago_exceded_amount + $excededAmount
+            ]);
+        }
+
+    }
+
+    public function processExcededUsers( $counter_users ){
+
+        $exceded = $this->postpago_plan->num_users - $counter_users;
+
+        if( $this->postpago_plan->num_users != 0 && $exceded < 0){
+            $excededAmount = $this->postpago_plan->prorated_users * abs($exceded);
+            \Log::debug("Usuarios excedentes:  ". $exceded);
+            \Log::debug("Monto excedentes:  ". $excededAmount);
+    
+            $this->postpago_plan->update([
+                'postpago_exceded_amount' => $this->postpago_plan->postpago_exceded_amount + $excededAmount
+            ]);
+        }
+
+    }
+
 }

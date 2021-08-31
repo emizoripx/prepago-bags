@@ -183,7 +183,8 @@ class CompanyAccountController extends Controller
             $companyAccount->update([
                 'production' => true,
                 'phase' => 'Production',
-                'is_postpago' => $data['account_type'] ? true : false
+                'is_postpago' => $data['account_type'] ? true : false,
+                'counter_users' => $data['account_type'] ? 1 : 0
             ]);
 
             // AGREGA UNA BOLSA GRATIS

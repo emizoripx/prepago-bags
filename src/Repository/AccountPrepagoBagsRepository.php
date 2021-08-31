@@ -6,12 +6,15 @@ namespace EmizorIpx\PrepagoBags\Repository;
 use Carbon\Carbon;
 use EmizorIpx\PrepagoBags\Models\PrepagoBag;
 use EmizorIpx\PrepagoBags\Utils\TypeFrequency;
+use DB;
+use EmizorIpx\PrepagoBags\Models\AccountPrepagoBags;
+use EmizorIpx\PrepagoBags\Traits\DecodeIdsTrait;
 
 class AccountPrepagoBagsRepository{
 
 
 
-
+    use DecodeIdsTrait;
 
     public function updateInvoicesAvailable($number_invoice_before, $bag){
         return $bag->acumulative ? $number_invoice_before +  $bag->number_invoices : $bag->number_invoices;
@@ -42,6 +45,44 @@ class AccountPrepagoBagsRepository{
             
         }
         
+    }
+
+    public function updateCounterProducts($company_id){
+
+        
+        $fel_company = AccountPrepagoBags::where('company_id', $this->getDecodeId($company_id)[0])->first();
+        
+        if($fel_company->is_postpago){
+            $fel_company->update([
+                'counter_products' => $fel_company->counter_products + 1
+            ]);
+        }
+
+    }
+
+    public function updateCounterClients($company_id){
+
+        
+        $fel_company = AccountPrepagoBags::where('company_id', $this->getDecodeId($company_id)[0])->first();
+        
+        if($fel_company->is_postpago){
+            $fel_company->update([
+                'counter_clients' => $fel_company->counter_clients + 1
+            ]);
+        }
+
+    }
+
+    public function updateCounterUsers($company_id){
+
+        $fel_company = AccountPrepagoBags::where('company_id', $company_id)->first();
+        
+        if( $fel_company && $fel_company->is_postpago){
+            $fel_company->update([
+                'counter_users' => $fel_company->counter_users + 1
+            ]);
+        }
+
     }
 
 }
