@@ -15,7 +15,7 @@ class FelClientCompanyObserver
     }
     public function created($model)
     {
-        \Log::debug("Created Fel Sync Product");
+        
         $this->repo->updateCounterClients($model->company_id);
     }
 

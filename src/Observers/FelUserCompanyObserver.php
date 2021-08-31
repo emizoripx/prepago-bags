@@ -15,8 +15,7 @@ class FelUserCompanyObserver
     }
     public function created($model)
     {
-        \Log::debug("Created User ");
-        \Log::debug($model->companyIsSet());
+        
         try{
             if($model->getCompany())
                 $this->repo->updateCounterUsers($model->company()->id) ;
