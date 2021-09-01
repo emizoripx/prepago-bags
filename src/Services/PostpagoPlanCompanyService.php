@@ -175,4 +175,20 @@ class PostpagoPlanCompanyService {
 
     }
 
+    public function processExcededInvoices(){
+        if ($this->postpago_plan->all_sector_docs) {
+            
+            $counterAllDocs = $this->countAllDocumentSectorInvoices();
+        } else {
+            
+            $counterAllDocs = $this->countDocumentSectorInvoices($this->postpago_plan->sector_doc_id);
+        }
+        
+        $limitWasReached = $this->verifyLimit($counterAllDocs);
+        
+        if($this->postpago_plan->num_invoices != 0 && $limitWasReached < 0){
+            $this->processExceded($limitWasReached);
+        }
+    }
+
 }
