@@ -45,10 +45,17 @@ class CheckCompanyPostpago implements ShouldQueue
 
             if($postpago_plan_service->checkDateLimit()){
 
-                AccountPrepagoBagService::changeToPostpagoAccount($company_plan->company_id);
+                $fel_company = AccountPrepagoBagService::changeToPostpagoAccount($company_plan->company_id);
+                
+                $postpago_plan_service->processExcededInvoices();
+                $postpago_plan_service->processExcededProducts( $fel_company->counter_products );
+                $postpago_plan_service->processExcededClients( $fel_company->counter_clients );
+                $postpago_plan_service->processExcededUsers( $fel_company->counter_users );
 
                 $postpago_plan_service->resetCounters();
                 $postpago_plan_service->resetStartDate();
+                
+                
 
                 \Log::debug('Reset postpago plan to company #'. $company_plan->company_id );
             }

@@ -112,7 +112,7 @@ class FelCompanyDocumentSector extends Model
                 }
 
                 $postpago_plan_service->resetCounters();
-                $postpago_plan_service->resetStartDate();
+                // $postpago_plan_service->resetStartDate();
 
                 $this->refresh();
 
