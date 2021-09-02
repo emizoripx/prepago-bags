@@ -176,8 +176,7 @@ class CompanyAccountController extends Controller
             ->setCompanyId($company_id)
             ->register()
             ->updateFelCompany()
-            ->syncParametrics()
-            ->getBranches();
+            ->syncParametrics();
 
             // PASAR A PRODUCCION
             $companyAccount->update([
@@ -200,11 +199,18 @@ class CompanyAccountController extends Controller
                 ->resetInvoiceAvailable()
                 ->resetCounter()
                 ->savePostpagoPlan($data['plan_id'], $data['enable_overflow'] ?? null , $data['start_date'] );
+
+                // TODO: sync branches
+
+                $this->credentials_repo->getBranches(true);
+
             } else{
                 $company->company_detail->service()
                 ->registerCompanySectorDocuments()
                 ->addBagGift()
                 ->saveDuedateAndInvoiceAvailable($data['duedate'], $data['invoice_number_available']);
+
+                $this->credentials_repo->getBranches();
             }
 
             $usersToken = $company->tokens;

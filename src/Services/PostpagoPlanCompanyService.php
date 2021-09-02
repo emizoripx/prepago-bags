@@ -175,6 +175,24 @@ class PostpagoPlanCompanyService {
 
     }
 
+    public function processExcededBranches( $counter_branches ){
+
+        
+        $exceded = $this->postpago_plan->num_branches - $counter_branches;
+
+        if( $this->postpago_plan->num_branches != 0 && $exceded < 0){
+            $excededAmount = $this->postpago_plan->prorated_branches * abs($exceded);
+
+            \Log::debug("Sucursales excedentes:  ". $exceded);
+            \Log::debug("Monto excedentes:  ". $excededAmount);
+
+            $this->postpago_plan->update([
+                'postpago_exceded_amount' => $this->postpago_plan->postpago_exceded_amont + $excededAmount
+            ]);
+        }
+
+    }
+
     public function processExcededInvoices(){
         if ($this->postpago_plan->all_sector_docs) {
             
