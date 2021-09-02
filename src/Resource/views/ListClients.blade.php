@@ -306,7 +306,7 @@
                         success: function(result) {
                             if (result.success == true) {
                                 $('div.action-modal').modal('hide');
-                                alert("Cliente Vinculado Satisfactoriamente");
+                                
                                 location.reload();
                             } else {
                                 alert(result.msg);

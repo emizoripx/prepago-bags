@@ -87,12 +87,15 @@ class FelCompanyDocumentSector extends Model
     }
     public function setPostpagoCounter($sign = 1)
     {
+        $postpago_plan = PostpagoPlanCompany::where('company_id', $this->company_id)->first();
+        // In case postpago plan is not set
+        if (empty($postpago_plan))
+            return $this;
         
         try {
             $this->postpago_counter = $this->postpago_counter + (1 * $sign);
             $this->save();
 
-            $postpago_plan = PostpagoPlanCompany::where('company_id', $this->company_id)->first();
             $postpago_plan_service = $postpago_plan->service();
 
             if ($postpago_plan->all_sector_docs) {
