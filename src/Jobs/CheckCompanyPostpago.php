@@ -51,6 +51,7 @@ class CheckCompanyPostpago implements ShouldQueue
                 $postpago_plan_service->processExcededProducts( $fel_company->counter_products );
                 $postpago_plan_service->processExcededClients( $fel_company->counter_clients );
                 $postpago_plan_service->processExcededUsers( $fel_company->counter_users );
+                $postpago_plan_service->processExcededBranches($fel_company->counter_branches);
 
                 $postpago_plan_service->resetCounters();
                 $postpago_plan_service->resetStartDate();

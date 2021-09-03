@@ -9,6 +9,7 @@ use EmizorIpx\PrepagoBags\Utils\TypeFrequency;
 use DB;
 use EmizorIpx\PrepagoBags\Models\AccountPrepagoBags;
 use EmizorIpx\PrepagoBags\Traits\DecodeIdsTrait;
+use Exception;
 
 class AccountPrepagoBagsRepository{
 
@@ -82,6 +83,27 @@ class AccountPrepagoBagsRepository{
                 'counter_users' => $fel_company->counter_users + 1
             ]);
         }
+
+    }
+
+    public static function updateCounterBranches ($company_id){
+        $fel_company = AccountPrepagoBags::where("company_id",$company_id)->first();
+
+        try{
+            if($fel_company && $fel_company->is_postpago){
+                $fel_company->update([
+                    'counter_branches' => $fel_company->counter_branches + 1
+                ]);
+            }
+        } catch(Exception $ex){
+            \Log::debug("Error al Actualizar contador de Sucursales");
+        }
+    }
+
+    public static function getCounterBranches($company_id){
+        $company = AccountPrepagoBags::where('company_id', $company_id)->select('counter_branches')->first();
+
+        return $company->counter_branches;
 
     }
 
