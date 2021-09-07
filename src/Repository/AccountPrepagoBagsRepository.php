@@ -107,4 +107,10 @@ class AccountPrepagoBagsRepository{
 
     }
 
+    public static function getFelCompanyDetail($company_id){
+        $company = AccountPrepagoBags::where('company_id', $company_id)->first();
+
+        return $company;
+    }
+
 }

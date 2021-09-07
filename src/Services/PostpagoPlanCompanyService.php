@@ -209,4 +209,37 @@ class PostpagoPlanCompanyService {
         }
     }
 
+    public function checkLimitsAccount ($entity, $fel_company){
+        $fel_company->refresh();
+        if($fel_company->production && $fel_company->is_postpago){
+
+            switch ($entity) {
+                case 'product':
+                    if($this->verifyLimitProducts($fel_company->counter_products) && !$this->postpago_plan->enable_overflow ){
+                        return false;
+                    }
+                    
+                    return true;
+
+                    break;
+                case 'client':
+                    
+                    if($this->verifyLimitClients($fel_company->counter_clients) && !$this->postpago_plan->enable_overflow ){
+                        return false;
+                    }
+                    
+                    return true;
+
+                    break;
+                
+                default:
+                    return true;
+                    break;
+            }
+
+        }
+        return true;
+
+    }
+
 }
