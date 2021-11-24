@@ -28,6 +28,10 @@
                      <label for="client_secret">Client Secret</label>
                      <input type="text" class="form-control" id="client_secret" name="client_secret" placeholder="Client Secret" autocomplete="off">
                  </div>
+                 <div class="form-group">
+                     <label for="client_secret">Host</label>
+                     <input type="text" class="form-control" id="host" name="host" placeholder="Host" autocomplete="off" required>
+                 </div>
 
              </div>
              <div class="modal-footer">

@@ -82,7 +82,7 @@ class CompanyAccountController extends Controller
             // ACTUALIZA LAS CREDENCIALES Y OBTIENE LAS PARAMETRICAS
             $this->credentials_repo
             ->setCredentials($data['client_id'], $data['client_secret'])
-            ->setHost(config('clientfel.host_demo'))
+            ->setHost($data['host'])
             ->setCompanyId($company_id)
             ->register()
             ->updateFelCompany()
