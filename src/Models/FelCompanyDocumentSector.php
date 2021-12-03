@@ -87,7 +87,7 @@ class FelCompanyDocumentSector extends Model
     }
     public function setPostpagoCounter($sign = 1)
     {
-        $postpago_plan = PostpagoPlanCompany::where('company_id', $this->company_id)->first();
+        $postpago_plan = PostpagoPlanCompany::where('company_id', $this->company_id)->orderBy('id', 'DESC')->first();
         // In case postpago plan is not set
         if (empty($postpago_plan))
             return $this;
@@ -108,9 +108,16 @@ class FelCompanyDocumentSector extends Model
 
             $limitWasReached = $postpago_plan_service->verifyLimit($counterAllDocs);
 
-            if ($postpago_plan_service->checkDateLimit()) {
+            $is_limit = $postpago_plan_service->checkLimitInvoices($counterAllDocs);
 
-                if ($limitWasReached < 0 && $postpago_plan->enable_overflow) {
+            \Log::debug("Limit >>>>>>>>>>>");
+            \Log::debug($limitWasReached);
+            \Log::debug($is_limit ? "true" : "false");
+
+            if ($postpago_plan_service->checkDateLimit()) {
+                \Log::debug("Limit Date >>>>>>>>>>>>>>>");
+
+                if ($is_limit && $postpago_plan->enable_overflow) {
                     $postpago_plan_service->processExceded($limitWasReached);
                 }
 
@@ -119,7 +126,7 @@ class FelCompanyDocumentSector extends Model
 
                 $this->refresh();
 
-            } elseif ($limitWasReached <= 0 && !$postpago_plan->enable_overflow) {
+            } elseif ($is_limit && !$postpago_plan->enable_overflow) {
                 // TODO: Cambiar a Cuenta Prepago
                 AccountPrepagoBagService::changeToPrepagoAccount($postpago_plan->company_id);
 

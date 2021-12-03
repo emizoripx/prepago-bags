@@ -131,6 +131,9 @@ class CompanyAccountController extends Controller
         
         $data = $request->all();
 
+        \Log::debug("Data Production Up >>>>>>>>>>>>>");
+        \Log::debug($data);
+
         try{
 
             $company_id = $data['company_id'];
@@ -177,6 +180,9 @@ class CompanyAccountController extends Controller
             ->register()
             ->updateFelCompany()
             ->syncParametrics();
+
+            \Log::debug("Plan type >>>>>>>>>>>>>>>");
+            \Log::debug($data['account_type']);
 
             // PASAR A PRODUCCION
             $companyAccount->update([
