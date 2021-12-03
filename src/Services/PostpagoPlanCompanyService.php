@@ -48,12 +48,25 @@ class PostpagoPlanCompanyService {
         return $this->postpago_plan->num_invoices - $invoiceCounter;
 
     }
+
+    public function checkLimitInvoices($invoiceCounter){
+        if($this->postpago_plan->num_invoices == 0){
+            return false;
+        }
+
+        return  $invoiceCounter >= $this->postpago_plan->num_invoices;
+    }
     
 
     public function checkDateLimit(){
 
-        $date_postpago_limit = Carbon::parse($this->postpago_plan->start_date)->addMonths($this->postpago_plan->frequency);
+        $date_postpago_limit = Carbon::parse($this->postpago_plan->start_date)->addMonths($this->postpago_plan->frequency)->toDateString();
         $current_date = Carbon::now()->toDateString();
+
+        \Log::debug("CheckLimitDate Limit Date");
+        \Log::debug($date_postpago_limit);
+        \Log::debug("CheckLimitDate Current Date");
+        \Log::debug($current_date);
 
         return $current_date > $date_postpago_limit;
     }

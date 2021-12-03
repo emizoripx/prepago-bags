@@ -183,7 +183,7 @@ class AccountPrepagoBagService {
             'prorated_users' => $plan->prorated_users,
             'frequency' => $plan->frequency,
             'all_sector_docs' => $plan->all_sector_docs,
-            'enable_overflow' => $enable_overflow ?? $plan->enable_overflow,
+            'enable_overflow' => $enable_overflow == 'true' ? true : false,
             'company_id' => $this->fel_company->company_id,
             'start_date' => $start_date
         ]);
