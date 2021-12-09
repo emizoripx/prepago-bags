@@ -92,7 +92,8 @@ class CompanyAccountController extends Controller
 
             // CAMBIA A PRUEBAS PILOTO
             $companyAccount->update([
-                'phase' => 'Piloto testing'
+                'phase' => 'Piloto testing',
+                'prefactura_number_counter' => 0,
             ]);
 
             // AGREGA UNA BOLSA GRATIS
@@ -131,12 +132,14 @@ class CompanyAccountController extends Controller
         
         $data = $request->all();
 
-        \Log::debug("Data Production Up >>>>>>>>>>>>>");
-        \Log::debug($data);
+        \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> data : " . json_encode($data));
 
         try{
 
             $company_id = $data['company_id'];
+            $company = Company::where('id', $company_id)->firstOrFail();
+
+            \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> Change company : # " . $company_id . " to Plan  " . $data['account_type']);
 
             $companyAccount = AccountPrepagoBags::where('company_id', $company_id)->firstOrFail();
 
@@ -157,21 +160,19 @@ class CompanyAccountController extends Controller
             ->purgeClients()
             ->purgeBranches()
             ->purgePOS()
-            ->purgeSectorDocuments()
+            ->purgeCompanyDocumentSector()
             ->purgeActivityDocumentSector();
-
+            \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> test data IMPUESTOS deleted  : ");
             // PURGAR DATOS DE EMIZOR5
-            $company = Company::where('id', $company_id)->firstOrFail();
-            \Log::debug('Company......');
-            \Log::debug($company);
+            
             $company->invoices()->forceDelete();
             $company->clients()->forceDelete();
             $company->products()->forceDelete();
             $company->save();
-
+            \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> invoices, clients, products deleted");
             // RESET COUNTERS
             $this->purgeFeldataService->resetNumbersCounter($company);
-
+            \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> counters reset");
             // ACTUALIZA LAS CREDENCIALES Y OBTIENE LAS PARAMETRICAS
             $this->credentials_repo
             ->setCredentials($data['client_id'], $data['client_secret'])
@@ -181,65 +182,68 @@ class CompanyAccountController extends Controller
             ->updateFelCompany()
             ->syncParametrics();
 
-            \Log::debug("Plan type >>>>>>>>>>>>>>>");
-            \Log::debug($data['account_type']);
+            \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> credentials to connect to fel set up");
+            
 
             // PASAR A PRODUCCION
             $companyAccount->update([
                 'production' => true,
                 'phase' => 'Production',
                 'is_postpago' => $data['account_type'] ? true : false,
-                'counter_users' => $data['account_type'] ? 1 : 0
+                'counter_users' => $data['account_type'] ? 1 : 0,
+                'prefactura_number_counter' => 0,
             ]);
-
+            \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> production PLAN setup DB saved");
             // AGREGA UNA BOLSA GRATIS
-            \Log::debug($companyAccount->is_postpago);
             // if(!$companyAccount->is_postpago){
             //     \Log::debug('Es Prepago');
             //     $this->accountPrepagoBagsService->addBagGift($company_id);
             // }
 
             if($companyAccount->is_postpago){
-
+                
                 $companyAccount->service()
+                ->registerCompanySectorDocuments()
                 ->resetInvoiceAvailable()
                 ->resetCounter()
                 ->savePostpagoPlan($data['plan_id'], $data['enable_overflow'] ?? null , $data['start_date'] );
-
+                \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> Plan POSTPAGO setup correctly");
                 // TODO: sync branches
 
                 $this->credentials_repo->getBranches(true);
-
+                \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> PLAN POSTPAGO : Get branches from FEL done");
             } else{
                 $company->company_detail->service()
                 ->registerCompanySectorDocuments()
                 ->addBagGift()
                 ->saveDuedateAndInvoiceAvailable($data['duedate'], $data['invoice_number_available']);
-
+                \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> Plan PREPAGO setup correctly");
                 $this->credentials_repo->getBranches();
+                \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> PLAN PREPAGO : Get branches from FEL done");
             }
 
             $usersToken = $company->tokens;
             foreach($usersToken as $token){
-                \Log::debug('tokens');
-                \Log::debug($token);
                 $token->token = Str::random(64);
                 $token->save();
             }
-
+            \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> reset tokens done");
+            \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> complete!");
             return response()->json([
                 'success' => true
             ]);
 
         } catch(ClientFelException $ex){
+            \Log::emergency(" PRODUCTION-UP >>>>>>>>>>>>> ERROR File: " . $ex->getFile() . " Line: " . $ex->getLine() . " Message: " . $ex->getMessage());
             return response()->json([
                 'success' => false,
                 'msg' => $ex->getMessage()
             ]);
-        }catch (PrepagoBagsException $e) {
+        }catch (PrepagoBagsException $ex) {
+            \Log::emergency(" PRODUCTION-UP >>>>>>>>>>>>> ERROR File: " . $ex->getFile() . " Line: " . $ex->getLine() . " Message: " . $ex->getMessage());
             return response()->json([
                 'success' => false,
-                'msg' => $e->getMessage()
+                'msg' => $ex->getMessage()
             ]);
         }
     }
