@@ -103,7 +103,7 @@ class FelCompanyDocumentSector extends Model
                 $counterAllDocs = $postpago_plan_service->countAllDocumentSectorInvoices();
             } else {
 
-                $counterAllDocs = $postpago_plan_service->countDocumentSectorInvoices($postpago_plan->sector_doc_id);
+                $counterAllDocs = $postpago_plan_service->countDocumentSectorInvoices();
             }
 
             $limitWasReached = $postpago_plan_service->verifyLimit($counterAllDocs);
