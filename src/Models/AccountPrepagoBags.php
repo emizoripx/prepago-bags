@@ -18,10 +18,11 @@ class AccountPrepagoBags extends Model
 
     protected $table = 'fel_company';
 
-    protected $fillable = ['company_id', 'production', 'deleted_at', 'is_postpago', 'enabled', 'phase','ruex','nim','fel_company_id', 'modality_code', 'counter_products', 'counter_clients','counter_users', 'counter_branches','prefactura_number_counter'];
+    protected $fillable = ['company_id', 'production', 'deleted_at', 'is_postpago', 'enabled', 'phase','ruex','nim','fel_company_id', 'modality_code', 'counter_products', 'counter_clients','counter_users', 'counter_branches','prefactura_number_counter', 'whatsapp_settings'];
 
     protected $casts = [
-        'settings' => 'string'
+        'settings' => 'string',
+        'whatsapp_settings' => 'array'
     ];
 
     public static function getInvoiceAvailable($company_id){
@@ -92,6 +93,51 @@ class AccountPrepagoBags extends Model
         $this->invoice_number_available = $this->invoice_number_available - 1;
         \Log::debug("#Facturas disponibles :" .$this->invoice_number_available);
         return $this;
+    }
+
+    public function getLimitWhatsappMessage() {
+
+        if( ! isset( $this->whatsapp_settings ) || ! isset($this->whatsapp_settings['message_limit']) ) {
+            \Log::debug("Limite de Mensajes es 0");
+            return 0;
+        }
+
+        return $this->whatsapp_settings['message_limit'];
+
+    }
+
+    public function isWhatsappAutoSendRecurringInvoice ( ) {
+
+        if( ! isset( $this->whatsapp_settings ) || ! isset($this->whatsapp_settings['auto_send_recurring_invoice']) ) {
+            return false;
+        }
+
+        return $this->whatsapp_settings['auto_send_recurring_invoice'] == 1 ? true : false;
+
+    }
+
+    public function hasMessagesAvailable() {
+
+        $limit = $this->getLimitWhatsappMessage();
+
+        if( $limit == -1 || $limit > 0 ) {
+            return true;
+        }
+
+        \Log::debug("NO TIENES MENSAJES DISPONIBLES PARA ENVIAR");
+        return false;
+
+    }
+
+    public function reduceCounterLimitMessages() {
+
+        if ( isset($this->whatsapp_settings['message_limit']) && $this->whatsapp_settings['message_limit'] > 0 ) {
+
+            $this->whatsapp_settings['message_limit'] = $this->whatsapp_settings['message_limit'] - 1;
+            $this->save();
+
+        }
+
     }
 
     public function checkIsPostpago(){
