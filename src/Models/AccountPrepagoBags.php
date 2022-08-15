@@ -133,8 +133,13 @@ class AccountPrepagoBags extends Model
 
         if ( isset($this->whatsapp_settings['message_limit']) && $this->whatsapp_settings['message_limit'] > 0 ) {
 
-            $this->whatsapp_settings['message_limit'] = $this->whatsapp_settings['message_limit'] - 1;
+            \Log::debug("Mensajes disponibles: " . $this->whatsapp_settings['message_limit'] );
+            
+            $whatsapp_settings = $this->whatsapp_settings;
+            $whatsapp_settings['message_limit'] = $whatsapp_settings['message_limit'] - 1;
+            $this->whatsapp_settings = $whatsapp_settings;
             $this->save();
+            \Log::debug("Mensajes Restantes: " . $this->whatsapp_settings['message_limit'] );
 
         }
 
