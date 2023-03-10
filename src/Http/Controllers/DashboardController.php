@@ -255,7 +255,7 @@ class DashboardController extends Controller
     {
 
         info("actualizando settings   " ,$request->only(['invoice_generators']));
-        $company = AccountPrepagoBags::find($company_id);
+        $company = AccountPrepagoBags::whereCompanyId($company_id)->first();
         $company->level_invoice_number_generation = $request->level_invoice_number_generation;
         $company->save();
 
