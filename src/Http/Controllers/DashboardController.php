@@ -11,7 +11,7 @@ use Illuminate\Routing\Controller;
 use DB;
 use EmizorIpx\PrepagoBags\Models\PostpagoPlanCompany;
 use EmizorIpx\PrepagoBags\Models\PrepagoBagsPayment;
-
+use Illuminate\Http\Request;
 class DashboardController extends Controller
 {
     public function clientsList(){
@@ -25,21 +25,15 @@ class DashboardController extends Controller
         if ($phase != "Testing" && $phase != "Production") $phase == "";
 
         
-        $clientsPrepago = AccountPrepagoBags::join('company_user', 'company_user.company_id','=','fel_company.company_id')
-                                            ->join('companies', 'fel_company.company_id', '=', 'companies.id')
-                                            ->Join('users','users.id','=','company_user.user_id')
-                    ->select('companies.id','fel_company.company_id' ,'companies.settings','companies.created_at' ,'fel_company.production', 'fel_company.is_postpago', 'fel_company.enabled', 'fel_company.phase','users.email')
-                    ->where('fel_company.deleted_at', '=', null)
-                    ->where('company_user.is_owner', 1)
+        $clientsPrepago = AccountPrepagoBags::join('companies', 'fel_company.company_id', '=', 'companies.id')
+                    ->select('companies.id','fel_company.company_id' ,'companies.settings','companies.created_at' ,'fel_company.production', 'fel_company.is_postpago', 'fel_company.enabled', 'fel_company.phase')
                     ->orderBy('companies.id','desc')
                     ->when($search, function ($query, $search) {
-                        return $query->where('users.email','like', "%".$search."%");
+                        return $query->whereRaw(\DB::raw('MATCH (companies.settings) AGAINST ("'.$search. '" IN NATURAL LANGUAGE MODE)'));
                     })
                     ->when($phase, function ($query, $phase) {
                         return $query->where('fel_company.phase', $phase);
-                    })
-                    ->paginate(15);
-
+                    })->paginate(15);
         
         return view('prepagobags::ListClients', compact('clientsPrepago', "search", "phase", "user_hash"));
 
@@ -151,7 +145,13 @@ class DashboardController extends Controller
             25 => "Factura de Productos Nacionales",
             26 => "Factura de Productos Nacionales - ICE",
             27 => "Factura Regimen 7RG",
-            28 => "Factura Comercial de Exportación de Servicios"
+            28 => "Factura Comercial de Exportación de Servicios",
+            29 => "Factura Comercial de Exportación de Servicios",
+            34 => "Factura compra venta Bonificaciones",
+            35 => "Factura compra venta Bonificaciones",
+            38 => "Factura compra venta Bonificaciones",
+            46 => "Factura compra venta Bonificaciones",
+            51 => "Factura compra venta Bonificaciones",
         ];
 
         return view('prepagobags::components.information' , compact('company', 'document_sectors','arrayNames', 'post_pago_plan_companies', 'sum_all_documents','sum_all_clients','sum_all_products','sum_all_branches','sum_all_users','due_invoices', 'prepago_bags_payments') );
@@ -205,5 +205,112 @@ class DashboardController extends Controller
                     ->where('companies.id',$company_id)
                     ->first();
         return view('prepagobags::components.upClientModal', compact('company'));
+    }
+    public function showUsers($company_id)
+    {
+        $company = AccountPrepagoBags::join('companies', 'fel_company.company_id', '=', 'companies.id')
+        ->select(
+            'companies.id',
+            'fel_company.company_id',
+            'fel_company.client_id',
+            'fel_company.production',
+            'fel_company.is_postpago',
+            'companies.settings'
+        )
+            ->where('fel_company.deleted_at', '=', null)
+            ->where('companies.id', $company_id)
+            ->first();
+
+        $users = \DB::table('company_user')
+                ->join('users','users.id','company_user.user_id')
+                ->whereCompanyId($company_id)
+                ->select('users.first_name', 'users.last_name','users.phone','users.email','users.email_verified_at','users.confirmation_code','users.last_login','users.remember_token','users.has_password','users.is_superadmin','users.created_at','users.oauth_provider_id')
+                ->get();
+        
+
+        return view('prepagobags::components.users', compact('users','company'));
+    }
+    public function showSettings($company_id)
+    {
+
+        $company = AccountPrepagoBags::join('companies', 'fel_company.company_id', '=', 'companies.id')
+        ->select(
+            'companies.id',
+            'fel_company.company_id',
+            'fel_company.client_id',
+            'fel_company.production',
+            'fel_company.is_postpago',
+            'companies.settings',
+            'fel_company.level_invoice_number_generation'
+        )
+            ->where('fel_company.deleted_at', '=', null)
+            ->where('companies.id', $company_id)
+            ->first();
+        $invoice_generators = \DB::table('invoice_generator_number')->whereCompanyId($company_id)->orderBy('code')->get();
+        $sector_documents  = \DB::table('fel_sector_document_types')->selectRaw('distinct codigo, documentoSector')->whereCompanyId($company_id)->pluck('documentoSector','codigo')->toArray();
+        return view('prepagobags::components.settings', compact('company', 'invoice_generators', 'sector_documents'));
+
+    }
+    public function updateSettings(Request $request, $company_id)
+    {
+
+        info("actualizando settings   " ,$request->only(['invoice_generators']));
+        $company = AccountPrepagoBags::find($company_id);
+        $company->level_invoice_number_generation = $request->level_invoice_number_generation;
+        $company->save();
+
+        switch ($request->level_invoice_number_generation) {
+            case 1:
+                $codes = \DB::table('fel_branches')->whereCompanyId($company_id)->pluck("codigo");
+                break;
+            case 2:
+                $codes = \DB::table('fel_branches')->selectRaw(\DB::raw('concat(ifnull(fel_branches.codigo,0),"-",ifnull(tmp.codigo,0)) as codigo'))
+                ->leftJoin(\DB::raw(' (select 0  as codigo, ' . $company_id . ' as company_id union select codigo, company_id from fel_pos where company_id = ' . $company_id . ') as tmp'), 'tmp.company_id', 'fel_branches.company_id')
+                ->where('fel_branches.company_id',$company_id)
+                ->pluck("codigo");
+
+                break;
+            case 3:
+                $codes = \DB::table('fel_branches')
+                ->selectRaw(\DB::raw('concat(ifnull(fel_branches.codigo,2),"-",ifnull(tmp.codigo,0), "-", ifnull(fel_sector_document_types.codigo,2)) as codigo '))
+                ->leftJoin(\DB::raw(' (select 0  as codigo, '.$company_id.' as company_id union select codigo, company_id from fel_pos where company_id = '.$company_id.') as tmp'), 'tmp.company_id', 'fel_branches.company_id')
+                ->leftJoin('fel_sector_document_types', 'fel_sector_document_types.codigoSucursal', 'fel_branches.codigo')
+                ->where('fel_branches.company_id',$company_id)
+                ->where('fel_sector_document_types.company_id',$company_id)
+                ->pluck("codigo");
+
+                break;
+            default:
+                $codes = [];
+                break;
+        }
+
+        if (!empty($codes)) {
+
+            $existence_codes = \DB::table('invoice_generator_number')->whereCompanyId($company_id)->whereIn('code',$codes)->pluck('code')->toArray();
+
+            $create_new_codes = [];
+            foreach ($codes as $code ) {
+                if(!in_array($code, $existence_codes)) {
+                    $create_new_codes[] = [
+                        "company_id"=>$company_id,
+                        "code"=>$code,
+                        "number_counter"=>1
+                    ];
+                }
+            }
+            if(!empty($create_new_codes)) {
+                \DB::table('invoice_generator_number')->insert($create_new_codes);
+            }
+
+        }
+        if (!is_null($request->invoice_generators)) {
+
+            foreach ($request->invoice_generators as $key => $value) {
+                \DB::table('invoice_generator_number')->whereCode($key)->whereCompanyId($company_id)->update(['number_counter' => $value]);
+            }
+        }
+
+        return redirect()->route('dashboard.getClients');
     }
 }

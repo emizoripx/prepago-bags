@@ -75,6 +75,7 @@
             top: 186px;
             background: white;
         }
+
         .table-style-custom-planes thead th {
             vertical-align: bottom;
             border-bottom: 2px solid #dee2e6;
@@ -118,13 +119,13 @@
 
 <body>
     <div class="m-auto">
-        
-        
+
+
         <nav class="navbar fixed-top custom-header-navbar">
 
             <ul class="nav my-5 col-md-12">
                 <li class="nav-item">
-                    <a id="clients" class="nav-link" href="{{ route('dashboard.getClients') }}">CLIENTES</a>
+                    <a id="clients" class="nav-link" href="{{ route('dashboard.getClients') }}">EMPRESAS</a>
                 </li>
                 <li class="nav-item">
                     <a id="plans" class="nav-link" href="{{ route('postpago.index') }}">PLANES POSTPAGO</a>

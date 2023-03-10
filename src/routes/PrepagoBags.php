@@ -55,6 +55,9 @@ class PrepagoBags {
             Route::get('dashboard/form-phase-piloto/{company_id}', 'DashboardController@showForm');
             Route::get('dashboard/form-phase-production/{company_id}', 'DashboardController@showForm2');
             Route::get('dashboard/form-information/{company_id}', 'DashboardController@showInformation');
+            Route::get('dashboard/form-users/{company_id}', 'DashboardController@showUsers');
+        Route::get('dashboard/form-settings/{company_id}', 'DashboardController@showSettings');
+        Route::put('dashboard/company-settings/{company_id}', 'DashboardController@updateSettings');
             Route::get('dashboard/form-linked/{company_id}', 'DashboardController@showFormLikend');
             Route::get('dashboard/form-suspend/{company_id}', 'DashboardController@showFormSuspend');
             Route::get('dashboard/form-up/{company_id}', 'DashboardController@showFormUp');

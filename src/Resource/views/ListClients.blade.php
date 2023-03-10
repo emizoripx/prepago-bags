@@ -129,11 +129,6 @@
     input.cmn-toggle-round:checked+label:after {
         margin-left: 12px;
     }
-
-
-
-
-
 </style>
 
 <div class="">
@@ -182,6 +177,7 @@
             <table class="table table-striped" style="border:1px #dee2e6 solid;table-layout: fixed;">
                 <thead>
 
+                    <th width="5%">ID</th>
                     <th width="15%">COMPAÑIA</th>
                     <th width="25%">DUEÑO</th>
                     <th width="10%">CREADO</th>
@@ -192,8 +188,8 @@
                 </thead>
                 <thead>
 
+                    <th width="5%">ID</th>
                     <th width="15%">COMPAÑIA</th>
-                    <th width="25%">DUEÑO</th>
                     <th width="10%">CREADO</th>
                     <th width="10%">TIPO</th>
                     <th width="8%">FASE</th>
@@ -204,8 +200,8 @@
                     @foreach ($clientsPrepago as $client)
                     <tr>
 
+                        <td>{{ $client->id }}</td>
                         <td>{{ json_decode($client->settings)->name }}</td>
-                        <td>{{ $client->email }}</td>
                         <td>{{ $client->created_at->diffForHumans() }}</td>
                         <td>{!! $client->account_type_badge !!}</td>
                         <td>{!! $client->phase !!}</td>
@@ -232,14 +228,16 @@
                                     @endif
                                     @endif
                                     <a class="dropdown-item" data-type="actions-dashboard" data-href="{{ URL::to('dashboard/form-information/' . $client->company_id) }}" data-container=".action-modal">Información</a>
+                                    <a class="dropdown-item" data-type="actions-dashboard" data-href="{{ URL::to('dashboard/form-users/' . $client->company_id) }}" data-container=".action-modal">Usuarios</a>
 
                                     @if ($client->production == 0 || $client->company_id == env('COMPANY_ADMIN'))
                                     <a class="dropdown-item disabled" href="#">Vincular/Desvincular</a>
                                     @else
 
                                     <a class="dropdown-item" data-type="actions-dashboard" data-href="{{ URL::to('dashboard/form-linked/' . $client->company_id) }}" data-container=".action-modal">Vincular/Desvincular</a>
-
+                                    
                                     @endif
+                                    <a class="dropdown-item" data-type="actions-dashboard" data-href="{{ URL::to('dashboard/form-settings/' . $client->company_id) }}" data-container=".action-modal">Configuraciones</a>
 
                                 </div>
                             </div>
@@ -306,7 +304,7 @@
                         success: function(result) {
                             if (result.success == true) {
                                 $('div.action-modal').modal('hide');
-                                
+
                                 location.reload();
                             } else {
                                 alert(result.msg);
