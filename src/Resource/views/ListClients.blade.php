@@ -137,7 +137,7 @@
 
             <form action="{{ url('dashboard/clients') }}">
                 <div class="form-group has-search d-inline-block col-md-4">
-                    <input type="text" class="form-control" placeholder="Buscar por correo del dueño" id="search" name="search" value="{!! $search !!}" autocomplete="off" autofocus="on">
+                    <input type="text" class="form-control" placeholder="Buscar NIT, nombre de la compañia" id="search" name="search" value="{!! $search !!}" autocomplete="off" autofocus="on">
                 </div>
                 <div class="form-group d-inline-block">
                     <select name="phase" value="{!! $phase !!}" class="form-control">
