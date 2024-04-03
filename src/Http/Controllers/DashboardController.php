@@ -224,7 +224,7 @@ class DashboardController extends Controller
         $users = \DB::table('company_user')
                 ->join('users','users.id','company_user.user_id')
                 ->whereCompanyId($company_id)
-                ->select('users.first_name', 'users.last_name','users.phone','users.email','users.email_verified_at','users.confirmation_code','users.last_login','users.remember_token','users.has_password','users.is_superadmin','users.created_at','users.oauth_provider_id')
+                ->select('users.id','users.first_name', 'users.last_name','users.phone','users.email','users.email_verified_at','users.confirmation_code','users.last_login','users.remember_token','users.has_password','users.is_superadmin','users.created_at','users.oauth_provider_id')
                 ->get();
         
 
@@ -313,4 +313,20 @@ class DashboardController extends Controller
 
         return redirect()->route('dashboard.getClients');
     }
+
+    public function markVerified(Request $request, $id)
+    {
+        $user = \App\Models\User::find($id);
+
+        if (!empty($user)) {
+
+            $user->email_verified_at = now()->setTimezone(config('app.timezone'))->format("Y-m-d H:i:s");
+            $user->save();
+            
+            return response()->json(["status"=>true, "messages"=> "actualizado satisfactoriamente", "user" => $user->email_verified_at]);    
+        }
+
+        
+    }
+
 }

@@ -63,6 +63,7 @@ class PrepagoBags {
             Route::get('dashboard/form-up/{company_id}', 'DashboardController@showFormUp');
             Route::get('dashboard/form-edit-plans/{plan_id}', 'PostpagoPlanController@formEdit');
             Route::get('dashboard/form-create-plans', 'PostpagoPlanController@formCreate');
+            Route::get('dashboard/users/{id}/mark-verified', 'DashboardController@markVerified');
             
         });
 
