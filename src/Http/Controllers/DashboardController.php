@@ -3,40 +3,35 @@
 namespace EmizorIpx\PrepagoBags\Http\Controllers;
 
 use EmizorIpx\ClientFel\Utils\TypeDocumentSector;
-use EmizorIpx\PrepagoBags\Http\Resources\CompanyDocumentSectorResource;
 use EmizorIpx\PrepagoBags\Models\AccountPrepagoBags;
 use EmizorIpx\PrepagoBags\Models\FelCompanyDocumentSector;
 use EmizorIpx\PrepagoBags\Models\PostpagoPlan;
 use Illuminate\Routing\Controller;
+use App\Models\Company;
 use DB;
 use EmizorIpx\PrepagoBags\Models\PostpagoPlanCompany;
 use EmizorIpx\PrepagoBags\Models\PrepagoBagsPayment;
 use Illuminate\Http\Request;
 class DashboardController extends Controller
 {
-    public function clientsList(){
 
-        $search = request('search' , "");
-        $phase = request('phase' , "");
+    public function dashboard()
+    {
+        $enrolled_quantity = Company::count();
+        $trial_quantity = Company::count();
+        $request_quantity = Company::count();;
+        return view('prepagobags::superadmin.dashboard', ["enrolled_quantity" => $enrolled_quantity, "trial_quantity" => $trial_quantity, "request_quantity" => $request_quantity]);
+    }
 
-        $user_hash = [ 'hash' => request()->header('user')];
+    public function companies()
+    {
+        return view('prepagobags::superadmin.companies');
+    }
 
-
-        if ($phase != "Testing" && $phase != "Production") $phase == "";
-
+    public function invoices(Request $request, $company_id = null)
+    {
+        return view('prepagobags::superadmin.invoices', ["company_id" => $company_id]);
         
-        $clientsPrepago = AccountPrepagoBags::join('companies', 'fel_company.company_id', '=', 'companies.id')
-                    ->select('companies.id','fel_company.company_id' ,'companies.settings','companies.created_at' ,'fel_company.production', 'fel_company.is_postpago', 'fel_company.enabled', 'fel_company.phase')
-                    ->orderBy('companies.id','desc')
-                    ->when($search, function ($query, $search) {
-                        return $query->whereRaw(\DB::raw('MATCH (companies.settings) AGAINST ("'.$search. '" IN NATURAL LANGUAGE MODE)'));
-                    })
-                    ->when($phase, function ($query, $phase) {
-                        return $query->where('fel_company.phase', $phase);
-                    })->paginate(15);
-        
-        return view('prepagobags::ListClients', compact('clientsPrepago', "search", "phase", "user_hash"));
-
     }
 
     public function showForm($companyid)

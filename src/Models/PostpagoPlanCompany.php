@@ -3,7 +3,6 @@
 namespace EmizorIpx\PrepagoBags\Models;
 
 use EmizorIpx\PrepagoBags\Services\PostpagoPlanCompanyService;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PostpagoPlanCompany extends Model

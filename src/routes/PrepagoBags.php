@@ -5,7 +5,7 @@ namespace EmizorIpx\PrepagoBags\routes;
 use EmizorIpx\PrepagoBags\Models\FelPin;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
-
+use App\Http\Controllers\Auth\AdminLoginController;
 class PrepagoBags {
 
     public static function routes(){
@@ -32,26 +32,31 @@ class PrepagoBags {
 
 
     public static function adminRoutes() {
+        info("================================================== admin routes=====================");
 
+        Route::get('superu', [AdminLoginController::class, 'showLoginForm'])->name('admin.catchall')->middleware(['locale']);
+        Route::post('superu/login', [AdminLoginController::class, 'login'])->name('admin.login');
         Route::group(['namespace' => "\EmizorIpx\PrepagoBags\Http\Controllers"], function () {
-            Route::middleware(['check_auth_admin'])->group(function () {
                 
-                Route::get('dashboard/clients', 'DashboardController@clientsList')->name('dashboard.getClients');
-                Route::post('dashboard/pilot-up', 'CompanyAccountController@pilotUp')->name('dashboard.pilot');
-                Route::post('dashboard/production-up', 'CompanyAccountController@productionUp')->name('dashboard.production');
-                
-                Route::post('dashboard/postpago-plans', 'PostpagoPlanController@store')->name('postpago.store');
-                Route::get('dashboard/postpago-plans', 'PostpagoPlanController@index')->name('postpago.index');
-                Route::get('dashboard/postpago-plans/{id}', 'PostpagoPlanController@show')->name('postpago.show');
-                Route::put('dashboard/postpago-plans/{id}', 'PostpagoPlanController@update')->name('postpago.update');
-                Route::get('dashboard/postpago-plans/publish/{id}', 'PostpagoPlanController@publishPlan')->name('postpago.publish');
-                Route::get('dashboard/postpago-plans-to-select', 'PostpagoPlanController@getPostpagoPlans')->name('postpago.getPostpagoPlans');
+            Route::get('dashboard', 'DashboardController@dashboard')->name('admin.dashboard');
+            Route::get('dashboard/companies', 'DashboardController@companies')->name('admin.companies');
+            Route::get('dashboard/invoices', 'DashboardController@invoices')->name('admin.invoices');
+            Route::get('dashboard/companies/{id}/invoices', 'DashboardController@invoices')->name('admin.companies.invoices');
 
-                Route::post('dashboard/linked-client', 'CompanyAccountController@linkedClient')->name('dashboard.linkedClient');
-                Route::post('dashboard/suspend-client', 'CompanyAccountController@suspendClient')->name('dashboard.suspendClient');
-                Route::post('dashboard/up-client', 'CompanyAccountController@upClient')->name('dashboard.upClient');
-                
-            });
+            Route::post('dashboard/pilot-up', 'CompanyAccountController@pilotUp')->name('dashboard.pilot');
+            Route::post('dashboard/production-up', 'CompanyAccountController@productionUp')->name('dashboard.production');
+            
+            Route::post('dashboard/postpago-plans', 'PostpagoPlanController@store')->name('postpago.store');
+            Route::get('dashboard/postpago-plans', 'PostpagoPlanController@index')->name('postpago.index');
+            Route::get('dashboard/postpago-plans/{id}', 'PostpagoPlanController@show')->name('postpago.show');
+            Route::put('dashboard/postpago-plans/{id}', 'PostpagoPlanController@update')->name('postpago.update');
+            Route::get('dashboard/postpago-plans/publish/{id}', 'PostpagoPlanController@publishPlan')->name('postpago.publish');
+            Route::get('dashboard/postpago-plans-to-select', 'PostpagoPlanController@getPostpagoPlans')->name('postpago.getPostpagoPlans');
+
+            Route::post('dashboard/linked-client', 'CompanyAccountController@linkedClient')->name('dashboard.linkedClient');
+            Route::post('dashboard/suspend-client', 'CompanyAccountController@suspendClient')->name('dashboard.suspendClient');
+            Route::post('dashboard/up-client', 'CompanyAccountController@upClient')->name('dashboard.upClient');
+            
             Route::get('dashboard/form-phase-piloto/{company_id}', 'DashboardController@showForm');
             Route::get('dashboard/form-phase-production/{company_id}', 'DashboardController@showForm2');
             Route::get('dashboard/form-information/{company_id}', 'DashboardController@showInformation');
