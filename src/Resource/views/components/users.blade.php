@@ -50,6 +50,7 @@
                                     <td>NOMBRE</td>
                                     <td>ÚLTIMO INICIO DE SESION</td>
                                     <td>CREADO EN</td>
+                                    <td>VERIFICADO EN</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -58,7 +59,13 @@
                                     <td>{!! $user->email !!}</td>
                                     <td>{!! $user->first_name .' '.$user->first_name !!}</td>
                                     <td>{!! $user->last_login !!}</td>
-                                    <td>{!! $user->created_at !!}</td>
+                                    <td>{!! \Carbon\Carbon::parse($user->created_at)->format("Y-m-d H:m") !!}</td>
+                                    @if (!is_null($user->email_verified_at))
+                                    <td>{!! $user->email_verified_at !!}</td>
+                                    @else
+                                    <td> <button type="button" class="btn btn-primary btn-sm guardarCambios" data-userid="{{ $user->id }}">Verificar</button></td>
+                                    @endif
+
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -75,4 +82,28 @@
     </form>
 </div>
 
-{{-- </div> --}}
+<script>
+    $(document).ready(function() {
+        $('.guardarCambios').on('click', function(el) {
+            // Guarda una referencia al botón clicado
+            var self = $(this);
+
+            var userId = self.data('userid');
+            console.log(userId)
+            $.ajax({
+                url: "{!! URL::to('dashboard/users/') !!}" + "/" + userId + "/mark-verified",
+                type: 'GET',
+                success: function(response) {
+                    // Busca el td correspondiente dentro de la misma fila que el botón clicado
+                    var tdVerificado = self.closest('tr').find('td:nth-child(5)');
+                    // Actualiza el contenido del td
+                    tdVerificado.html(response.user);
+                },
+                error: function(xhr, status, error) {
+                    // Manejar errores si es necesario
+                    console.log(xhr, status, error)
+                }
+            });
+        });
+    });
+</script>
