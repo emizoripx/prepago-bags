@@ -38,6 +38,12 @@ class PrepagoBagsServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \EmizorIpx\PrepagoBags\Console\Commands\UpdateCompanyStatisticsCommand::class,
+            ]);
+        }
+
         // Migrations
         Paginator::useBootstrap();
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');

@@ -138,6 +138,20 @@ class InvoicesAdminTable extends Component
         }
     }
 
+    public function regeneratePdf($invoice_id)
+    {
+        try {
+            $invoice = Invoice::find($invoice_id);
+            if ($invoice) {
+                // Dispatch Invoice Ninja standard job for PDF generation
+                \App\Jobs\Entity\CreateEntityPdf::dispatch($invoice);
+                session()->flash('message', 'Generación de PDF solicitada para la factura #' . $invoice->number);
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al regenerar PDF: ' . $e->getMessage());
+        }
+    }
+
     public function render()
     {
         return view('prepagobags::components.superadmin.invoices-admin-table');

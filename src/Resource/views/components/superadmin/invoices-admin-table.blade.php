@@ -30,6 +30,19 @@
             </div>
         </div>
 
+        <div>
+            @if (session()->has('message'))
+                <div class="p-4 mb-4 text-sm text-emerald-800 rounded-lg bg-emerald-50 dark:bg-gray-800 dark:text-emerald-400" role="alert">
+                    {{ session('message') }}
+                </div>
+            @endif
+            @if (session()->has('error'))
+                <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                    {{ session('error') }}
+                </div>
+            @endif
+        </div>
+
 
     <div class="flex flex-col">
         <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -103,7 +116,13 @@
       
                                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200 " >
                                                 <li>
-                                                    
+                                                    <a href="{{ url('/') }}/client/invoice/{{ $invoice['id'] }}/download_pdf" target="_blank" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-emerald-400"> Visualizar PDF </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{{ url('/') }}/invoices/{{ $invoice['id'] }}/edit" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-emerald-400"> Editar Factura </a>
+                                                </li>
+                                                <li>
+                                                    <button wire:click="regeneratePdf({{ $invoice['id'] }})" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-emerald-400 text-yellow-500 font-medium"> Regenerar PDF </button>
                                                 </li>
                                             </ul>
                                           

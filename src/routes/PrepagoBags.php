@@ -42,6 +42,8 @@ class PrepagoBags {
             Route::get('dashboard/companies', 'DashboardController@companies')->name('admin.companies');
             Route::get('dashboard/invoices', 'DashboardController@invoices')->name('admin.invoices');
             Route::get('dashboard/companies/{id}/invoices', 'DashboardController@invoices')->name('admin.companies.invoices');
+            Route::get('dashboard/companies/{company_id}/profile', 'DashboardController@profile')->name('admin.companies.profile');
+            Route::get('dashboard/companies/{company_id}/impersonate', 'DashboardController@impersonate')->name('admin.companies.impersonate');
 
             Route::post('dashboard/pilot-up', 'CompanyAccountController@pilotUp')->name('dashboard.pilot');
             Route::post('dashboard/production-up', 'CompanyAccountController@productionUp')->name('dashboard.production');

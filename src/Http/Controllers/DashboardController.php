@@ -12,6 +12,7 @@ use DB;
 use EmizorIpx\PrepagoBags\Models\PostpagoPlanCompany;
 use EmizorIpx\PrepagoBags\Models\PrepagoBagsPayment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 class DashboardController extends Controller
 {
 
@@ -32,6 +33,47 @@ class DashboardController extends Controller
     {
         return view('prepagobags::superadmin.invoices', ["company_id" => $company_id]);
         
+    }
+
+    public function profile($company_id)
+    {
+        $company = AccountPrepagoBags::join('companies', 'fel_company.company_id', '=', 'companies.id')
+            ->select(
+                'companies.id',
+                'fel_company.company_id',
+                'fel_company.client_id',
+                'fel_company.production',
+                'fel_company.is_postpago',
+                'companies.settings'
+            )
+            ->where('fel_company.deleted_at', '=', null)
+            ->where('companies.id', $company_id)
+            ->firstOrFail();
+
+        return view('prepagobags::superadmin.company-profile', compact('company'));
+    }
+
+    public function impersonate($company_id)
+    {
+        // Find the owner of this company
+        $userCompany = DB::table('company_user')
+            ->where('company_id', $company_id)
+            ->where('is_owner', 1)
+            ->whereNull('deleted_at')
+            ->first();
+
+        if (!$userCompany) {
+            return redirect()->back()->with('error', 'No owner found for this company.');
+        }
+
+        $user = \App\Models\User::find($userCompany->user_id);
+        
+        if ($user) {
+            Auth::login($user);
+            return redirect()->route('dashboard'); // Redirects to the main invoice ninja dashboard
+        }
+
+        return redirect()->back()->with('error', 'User not found.');
     }
 
     public function showForm($companyid)
