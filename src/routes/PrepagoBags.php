@@ -36,9 +36,12 @@ class PrepagoBags {
 
         Route::get('superu', [AdminLoginController::class, 'showLoginForm'])->name('admin.catchall')->middleware(['locale']);
         Route::post('superu/login', [AdminLoginController::class, 'login'])->name('admin.login');
+        Route::get('superu/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
+        
         Route::group(['namespace' => "\EmizorIpx\PrepagoBags\Http\Controllers"], function () {
                 
             Route::get('dashboard', 'DashboardController@dashboard')->name('admin.dashboard');
+            
             Route::get('dashboard/companies', 'DashboardController@companies')->name('admin.companies');
             Route::get('dashboard/invoices', 'DashboardController@invoices')->name('admin.invoices');
             Route::get('dashboard/companies/{id}/invoices', 'DashboardController@invoices')->name('admin.companies.invoices');

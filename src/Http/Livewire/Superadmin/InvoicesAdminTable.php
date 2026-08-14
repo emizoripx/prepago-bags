@@ -36,6 +36,12 @@ class InvoicesAdminTable extends Component
     public $search = "";
 
     public $prefactura = "inactive";
+    public $estado = "";
+
+    public function updatedEstado()
+    {
+        $this->loadInvoices(null);
+    }
 
     public function updatedSearch()
     {
@@ -99,6 +105,12 @@ class InvoicesAdminTable extends Component
                                     }else {
                                         return $q->where('fel_invoice_requests.numeroFactura', '!=', 0);
                                     }
+                                })
+                                ->when($this->estado, function($q) {
+                                    if ($this->estado == "904") {
+                                        return $q->whereIn('fel_invoice_requests.codigoEstado', [904, 908]);
+                                    }
+                                    return $q->where('fel_invoice_requests.codigoEstado', $this->estado);
                                 });
                             })
                             ->leftJoin('companies', 'companies.id', 'invoices.company_id')
@@ -120,7 +132,7 @@ class InvoicesAdminTable extends Component
         }
     
         $invoices = $invoices->orderBy('invoices.id','desc');
-        $columns = ['invoices.id', 'invoices.status_id', 'fel_invoice_requests.codigoEstado','fel_invoice_requests.prefactura_number', 'fel_invoice_requests.fechaEmision', 'fel_invoice_requests.nombreRazonSocial', 'fel_invoice_requests.numeroDocumento', 'invoices.amount', 'fel_invoice_requests.numeroFactura', \DB::raw('json_extract(companies.settings,"$.name") as company_name'), 'companies.id as companyid'];
+        $columns = ['invoices.id', 'invoices.status_id', 'invoices.pdf_url', 'fel_invoice_requests.codigoEstado','fel_invoice_requests.prefactura_number', 'fel_invoice_requests.fechaEmision', 'fel_invoice_requests.nombreRazonSocial', 'fel_invoice_requests.numeroDocumento', 'invoices.amount', 'fel_invoice_requests.numeroFactura', \DB::raw('json_extract(companies.settings,"$.name") as company_name'), 'companies.id as companyid'];
         if (!is_null($cursor)){
             $invoices = $invoices->cursorPaginate($this->per_page,$columns , 'cursor', Cursor::fromEncoded($cursor));
         } else {
@@ -128,7 +140,9 @@ class InvoicesAdminTable extends Component
             $invoices = $invoices->cursorPaginate($this->per_page, $columns, 'cursor');
         }
      
-        $this->invoices= $invoices->items();
+        $this->invoices = collect($invoices->items())->map(function($invoice) {
+            return $invoice->getAttributes();
+        })->toArray();
         if ($this->hasMorePages = $invoices->hasMorePages()) {
             $this->nextCursor = $invoices->nextCursor()->encode();
         }
@@ -138,11 +152,28 @@ class InvoicesAdminTable extends Component
         }
     }
 
+    public function viewPdf($invoice_id)
+    {
+        try {
+            $invoice = Invoice::find($invoice_id);
+            if ($invoice) {
+                $file_path = $invoice->getPdfUrl();
+                $url = !empty($file_path) ? \Storage::disk(config('filesystems.default'))->url($file_path) : '';
+                $this->dispatchBrowserEvent('open-pdf', ['url' => $url, 'id' => $invoice_id]);
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al obtener PDF: ' . $e->getMessage());
+        }
+    }
+
     public function regeneratePdf($invoice_id)
     {
         try {
             $invoice = Invoice::find($invoice_id);
             if ($invoice) {
+                // Delete old PDF to ensure regeneration isn't cached
+                $invoice->service()->deletePdf();
+                
                 // Dispatch Invoice Ninja standard job for PDF generation
                 \App\Jobs\Entity\CreateEntityPdf::dispatch($invoice);
                 session()->flash('message', 'Generación de PDF solicitada para la factura #' . $invoice->number);

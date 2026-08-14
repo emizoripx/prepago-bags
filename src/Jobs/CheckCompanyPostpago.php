@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use DB;
 use EmizorIpx\PrepagoBags\Models\PostpagoPlanCompany;
 use EmizorIpx\PrepagoBags\Services\AccountPrepagoBagService;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 
 class CheckCompanyPostpago implements ShouldQueue
 {
@@ -24,6 +25,11 @@ class CheckCompanyPostpago implements ShouldQueue
     public function __construct()
     {
         //
+    }
+
+    public function middleware()
+    {
+        return [(new WithoutOverlapping())->dontRelease()];
     }
 
     /**

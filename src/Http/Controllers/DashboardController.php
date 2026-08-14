@@ -20,8 +20,9 @@ class DashboardController extends Controller
     {
         $enrolled_quantity = Company::count();
         $trial_quantity = Company::count();
-        $request_quantity = Company::count();;
-        return view('prepagobags::superadmin.dashboard', ["enrolled_quantity" => $enrolled_quantity, "trial_quantity" => $trial_quantity, "request_quantity" => $request_quantity]);
+        $request_quantity = Company::count();
+
+        return view('prepagobags::superadmin.dashboard', compact('enrolled_quantity', 'trial_quantity', 'request_quantity'));
     }
 
     public function companies()
@@ -69,8 +70,8 @@ class DashboardController extends Controller
         $user = \App\Models\User::find($userCompany->user_id);
         
         if ($user) {
-            Auth::login($user);
-            return redirect()->route('dashboard'); // Redirects to the main invoice ninja dashboard
+            Auth::login($user, true);
+            return redirect('/')->with(['login' => 'true']); // Redirects to the main invoice ninja dashboard
         }
 
         return redirect()->back()->with('error', 'User not found.');
@@ -362,8 +363,5 @@ class DashboardController extends Controller
             
             return response()->json(["status"=>true, "messages"=> "actualizado satisfactoriamente", "user" => $user->email_verified_at]);    
         }
-
-        
     }
-
 }

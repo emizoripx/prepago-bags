@@ -19,6 +19,18 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Routing\Router;
+use Livewire\Livewire;
+use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanyInformationTab;
+use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanyProductsTab;
+use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanyClientsTab;
+use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanyPaymentsTab;
+use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanySettingsTab;
+use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanyTable;
+use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanyUsersTab;
+use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\InvoicesAdminTable;
+use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\PilotoUp;
+use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\InvoiceEditModal;
+
 class PrepagoBagsServiceProvider extends ServiceProvider
 {
     /**
@@ -75,5 +87,19 @@ class PrepagoBagsServiceProvider extends ServiceProvider
 
         $router->aliasMiddleware('verify_account', VerifyAccountEnabled::class);
         $router->aliasMiddleware('verify_limits', VerifyLimitsAccount::class);
+
+        Livewire::component('company-information-tab', CompanyInformationTab::class);
+        Livewire::component('company-settings-tab', CompanySettingsTab::class);
+        Livewire::component('company-products-tab', CompanyProductsTab::class);
+        Livewire::component('company-clients-tab', CompanyClientsTab::class);
+        Livewire::component('company-payments-tab', CompanyPaymentsTab::class);
+        Livewire::component('company-parametrics-tab', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanyParametricsTab::class);
+        Livewire::component('company-branches-tab', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanyBranchesTab::class);
+        Livewire::component('company-templates-tab', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanyTemplatesTab::class);
+        Livewire::component('company-table', CompanyTable::class);
+        Livewire::component('company-users-tab', CompanyUsersTab::class);
+        Livewire::component('invoices-admin-table', InvoicesAdminTable::class);
+        Livewire::component('piloto-up', PilotoUp::class);
+        Livewire::component('prepagobags::superadmin.invoice-edit-modal', InvoiceEditModal::class);
     }
 }

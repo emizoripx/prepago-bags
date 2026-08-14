@@ -17,11 +17,11 @@
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;1,100;1,300;1,400;1,700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
         <!-- Fonts -->
         <style>
-           
+           .invert { filter: invert(1); }
         </style>
         <!-- Styles -->
         <link href="{{ mix('css/app.css') }}" rel="stylesheet">
@@ -34,7 +34,7 @@
         @stack('head')
     </head>
 
-    <body class="antialiased">
+    <body class="antialiased bg-slate-50 transition-colors duration-300 font-sans text-slate-600">
         @if(session()->has('message'))
             <div class="py-1 text-sm text-center text-white bg-primary disposable-alert">
                 {{ session('message') }}

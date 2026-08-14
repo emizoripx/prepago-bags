@@ -1,5 +1,5 @@
 <div
-    class="main_layout h-screen flex overflow-hidden bg-gray-100"
+    class="main_layout h-screen flex overflow-hidden bg-slate-50 transition-colors duration-300"
     x-data="{ sidebarOpen: false }"
     @keydown.window.escape="sidebarOpen = false"
     id="main-sidebar">
@@ -11,7 +11,7 @@
         
         
         <main
-            class="flex-1 relative z-0 overflow-y-auto pt-6 focus:outline-none bg-[#1f2937db]"
+            class="flex-1 relative z-0 overflow-y-auto pt-6 focus:outline-none bg-slate-50 transition-colors duration-300"
             tabindex="0" x-data
             x-init="$el.focus()" >
 

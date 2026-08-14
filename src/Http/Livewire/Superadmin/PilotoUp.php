@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Superadmin;
+namespace EmizorIpx\PrepagoBags\Http\Livewire\Superadmin;
 
 use App\Models\Company;
 use LivewireUI\Modal\ModalComponent;
@@ -22,6 +22,6 @@ class PilotoUp extends ModalComponent
 
     public function render()
     {
-        return view('prepagobags:components.superadmin.piloto-up');
+        return view('prepagobags::components.superadmin.piloto-up');
     }
 }
