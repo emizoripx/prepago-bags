@@ -51,6 +51,8 @@ class DashboardController extends Controller
             ->where('companies.id', $company_id)
             ->firstOrFail();
 
+        \View::share('company', $company);
+
         return view('prepagobags::superadmin.company-profile', compact('company'));
     }
 

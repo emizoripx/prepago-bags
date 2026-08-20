@@ -60,6 +60,13 @@ class CompanyInformationTab extends Component
             38 => "Factura compra venta Bonificaciones", 46 => "Factura compra venta Bonificaciones", 51 => "Factura compra venta Bonificaciones",
         ];
 
-        return view('prepagobags::components.superadmin.company-information-tab', compact('company', 'document_sectors', 'arrayNames', 'post_pago_plan_companies', 'stats', 'sum_all_documents', 'due_invoices', 'prepago_bags_payments'));
+        $settings = json_decode($company->settings ?? '{}');
+        $custom_reports = $settings->custom_reports ?? [];
+        $company_logo = $settings->company_logo ?? null;
+        if ($company_logo && !str_starts_with($company_logo, 'http')) {
+            $company_logo = url($company_logo);
+        }
+
+        return view('prepagobags::components.superadmin.company-information-tab', compact('company', 'document_sectors', 'arrayNames', 'post_pago_plan_companies', 'stats', 'sum_all_documents', 'due_invoices', 'prepago_bags_payments', 'custom_reports', 'company_logo', 'settings'));
     }
 }

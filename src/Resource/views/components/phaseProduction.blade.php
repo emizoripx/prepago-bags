@@ -33,23 +33,9 @@
                     </div>
                 </div>
                 <div class="row col-md-12">
-                    <div class="form-group col-md-6">
-                        <label for="name">Client ID</label>
-                        <input class="col-md-12 form-control" id="client_id" name="client_id" type="text"
-                            placeholder="Client ID" autocomplete="off">
-                        @error('client_id')
-                            <div class="alert alert-danger">{{ $message }}</div>
-                        @enderror
+                    <div class="form-group col-md-12">
+                        <p class="text-muted">La empresa se registrará automáticamente en Producción usando la API de Partner.</p>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="name">Client Secret</label>
-                        <input class="col-md-12 form-control" id="client_secret" name="client_secret" type="text"
-                            placeholder="Client Secret" autocomplete="off">
-                        @error('client_secret')
-                            <div class="alert alert-danger">{{ $message }}</div>
-                        @enderror
-                    </div>
-
                 </div>
                 <div class="row col-md-12">
                     <div class="form-group col-md-3">

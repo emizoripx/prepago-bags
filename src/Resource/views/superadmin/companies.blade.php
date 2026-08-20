@@ -16,5 +16,6 @@
     <div class="flex flex-col mt-4">
         
         <livewire:company-table /> 
+        <livewire:prepagobags::superadmin.create-company-modal />
     </div>
 @endsection

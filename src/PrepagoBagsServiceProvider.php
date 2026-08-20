@@ -30,6 +30,7 @@ use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanyUsersTab;
 use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\InvoicesAdminTable;
 use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\PilotoUp;
 use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\InvoiceEditModal;
+use EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\InvoiceDetailModal;
 
 class PrepagoBagsServiceProvider extends ServiceProvider
 {
@@ -101,5 +102,10 @@ class PrepagoBagsServiceProvider extends ServiceProvider
         Livewire::component('invoices-admin-table', InvoicesAdminTable::class);
         Livewire::component('piloto-up', PilotoUp::class);
         Livewire::component('prepagobags::superadmin.invoice-edit-modal', InvoiceEditModal::class);
+        Livewire::component('prepagobags::superadmin.invoice-detail-modal', InvoiceDetailModal::class);
+        Livewire::component('invoice-detail-modal', InvoiceDetailModal::class);
+        Livewire::component('prepagobags::superadmin.create-company-modal', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CreateCompanyModal::class);
+        Livewire::component('upload-company-logo-modal', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\UploadCompanyLogoModal::class);
+        Livewire::component('prepagobags::superadmin.upload-company-logo-modal', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\UploadCompanyLogoModal::class);
     }
 }

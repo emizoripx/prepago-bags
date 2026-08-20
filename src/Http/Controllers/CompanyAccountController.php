@@ -77,6 +77,7 @@ class CompanyAccountController extends Controller
             $company->save();
 
             // RESET COUNTERS
+            // RESET COUNTERS
             $this->purgeFeldataService->resetNumbersCounter($company);
 
             // ACTUALIZA LAS CREDENCIALES Y OBTIENE LAS PARAMETRICAS
@@ -88,7 +89,6 @@ class CompanyAccountController extends Controller
             ->updateFelCompany()
             ->syncParametrics()
             ->getBranches();
-            
 
             // CAMBIA A PRUEBAS PILOTO
             $companyAccount->update([
@@ -118,7 +118,13 @@ class CompanyAccountController extends Controller
                 'success' => false,
                 'msg' => $ex->getMessage()
             ]);
-        }catch (PrepagoBagsException $e) {
+        } catch (PrepagoBagsException $e) {
+            return response()->json([
+                'success' => false,
+                'msg' => $e->getMessage()
+            ]);
+        } catch (\Exception $e) {
+            \Log::emergency(" PILOT-UP >>>>>>>>>>>>> ERROR File: " . $e->getFile() . " Line: " . $e->getLine() . " Message: " . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'msg' => $e->getMessage()
@@ -173,6 +179,7 @@ class CompanyAccountController extends Controller
             // RESET COUNTERS
             $this->purgeFeldataService->resetNumbersCounter($company);
             \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> counters reset");
+            
             // ACTUALIZA LAS CREDENCIALES Y OBTIENE LAS PARAMETRICAS
             $this->credentials_repo
             ->setCredentials($data['client_id'], $data['client_secret'])
@@ -208,18 +215,26 @@ class CompanyAccountController extends Controller
                 ->resetCounter()
                 ->savePostpagoPlan($data['plan_id'], $data['enable_overflow'] ?? null , $data['start_date'] );
                 \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> Plan POSTPAGO setup correctly");
-                // TODO: sync branches
-
-                $this->credentials_repo->getBranches(true);
-                \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> PLAN POSTPAGO : Get branches from FEL done");
+                
+                try {
+                    $this->credentials_repo->getBranches(true);
+                    \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> PLAN POSTPAGO : Get branches from FEL done");
+                } catch (\Exception $e) {
+                    \Log::warning("Could not sync branches via legacy repo: " . $e->getMessage());
+                }
             } else{
                 $company->company_detail->service()
                 ->registerCompanySectorDocuments()
                 ->addBagGift()
                 ->saveDuedateAndInvoiceAvailable($data['duedate'], $data['invoice_number_available']);
                 \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> Plan PREPAGO setup correctly");
-                $this->credentials_repo->getBranches();
-                \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> PLAN PREPAGO : Get branches from FEL done");
+                
+                try {
+                    $this->credentials_repo->getBranches();
+                    \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> PLAN PREPAGO : Get branches from FEL done");
+                } catch (\Exception $e) {
+                    \Log::warning("Could not sync branches via legacy repo: " . $e->getMessage());
+                }
             }
 
             $usersToken = $company->tokens;
@@ -239,7 +254,13 @@ class CompanyAccountController extends Controller
                 'success' => false,
                 'msg' => $ex->getMessage()
             ]);
-        }catch (PrepagoBagsException $ex) {
+        } catch (PrepagoBagsException $ex) {
+            \Log::emergency(" PRODUCTION-UP >>>>>>>>>>>>> ERROR File: " . $ex->getFile() . " Line: " . $ex->getLine() . " Message: " . $ex->getMessage());
+            return response()->json([
+                'success' => false,
+                'msg' => $ex->getMessage()
+            ]);
+        } catch (\Exception $ex) {
             \Log::emergency(" PRODUCTION-UP >>>>>>>>>>>>> ERROR File: " . $ex->getFile() . " Line: " . $ex->getLine() . " Message: " . $ex->getMessage());
             return response()->json([
                 'success' => false,

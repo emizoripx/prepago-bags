@@ -41,7 +41,7 @@
             </div>
         @endif
 
-        @component('prepagobags::components.sidebar.main')
+        @component('prepagobags::components.sidebar.main', ['company' => $company ?? null])
             @yield('body')
         @endcomponent
         @livewire('livewire-ui-modal')
