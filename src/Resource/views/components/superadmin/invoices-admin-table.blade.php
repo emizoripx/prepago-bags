@@ -2,8 +2,7 @@
     $sectorNames = \EmizorIpx\ClientFel\Utils\TypeDocumentSector::ARRAY_NAMES ?? [];
 @endphp
 
-<div x-data="{ pdfModalOpen: false, currentPdfUrl: '', currentInvoiceId: '', copiedCufId: null }" 
-     @open-pdf.window="currentPdfUrl = $event.detail.url; currentInvoiceId = $event.detail.id; pdfModalOpen = true" 
+<div x-data="{ copiedCufId: null }" 
      class="container px-4 mx-auto @if(empty($company_id)) py-8 @endif">
         
     @if(empty($company_id))
@@ -153,8 +152,38 @@
                                 $cufShort = !empty($cufFull) ? (substr($cufFull, 0, 6) . '...' . substr($cufFull, -4)) : '';
                                 $balanceVal = (float)($invoice['balance'] ?? 0);
                                 $amountVal = (float)($invoice['amount'] ?? 0);
+
+                                // Mapping Tipo Documento Identidad
+                                $identityTypes = [
+                                    1 => 'CI',
+                                    2 => 'CEX',
+                                    3 => 'PAS',
+                                    4 => 'OD',
+                                    5 => 'NIT'
+                                ];
+                                $docTypeCode = $invoice['codigoTipoDocumentoIdentidad'] ?? 5;
+                                $docTypeLabel = $identityTypes[$docTypeCode] ?? 'NIT';
+
+                                // Evaluación de Error / Rechazo
+                                $hasError = ($invoice['codigoEstado'] == 902) || (!empty($invoice['errores']) && $invoice['codigoEstado'] != 690);
+                                $parsedErrors = [];
+                                if (!empty($invoice['errores'])) {
+                                    if (is_array($invoice['errores'])) {
+                                        $parsedErrors = $invoice['errores'];
+                                    } else {
+                                        $decoded = json_decode($invoice['errores'], true);
+                                        $parsedErrors = is_array($decoded) ? $decoded : [['description' => (string)$invoice['errores']]];
+                                    }
+                                } elseif ($invoice['codigoEstado'] == 902) {
+                                    $parsedErrors = [['code' => 902, 'description' => 'Factura rechazada por el Servicio de Impuestos Nacionales (SIN).']];
+                                }
                             @endphp
-                            <tr class="hover:bg-slate-50 transition-colors">
+                            <tr class="transition-colors @if($hasError) bg-rose-50/75 hover:bg-rose-100/90 border-l-4 border-l-rose-500 cursor-pointer @else hover:bg-slate-50 @endif"
+                                @if($hasError)
+                                wire:click="openDetail('{{ $invoice['id'] }}', 'general')"
+                                title="Haga clic en la fila para ver los detalles y errores del SIAT"
+                                @endif>
+                                
                                 <!-- Estado SIAT -->
                                 @if($prefactura == "inactive")
                                 <td class="px-3 py-3 text-xs whitespace-nowrap">
@@ -164,7 +193,7 @@
                                         if($invoice['codigoEstado'] == 690) {
                                             $statusClass = 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20';
                                             $statusText = 'Válido';
-                                        } elseif($invoice['codigoEstado'] == 905) {
+                                        } elseif($invoice['codigoEstado'] == 905 || $invoice['codigoEstado'] == 691) {
                                             $statusClass = 'bg-slate-100 text-slate-700 ring-1 ring-slate-600/20';
                                             $statusText = 'Anulado';
                                         } elseif($invoice['codigoEstado'] == 902) {
@@ -193,17 +222,21 @@
                                     </span>
                                 </td>
 
-                                <!-- CUF (Truncado + Copia 1-Click) -->
+                                <!-- CUF (Truncado + Copia 1-Click con Icono) -->
                                 <td class="px-3 py-3 text-xs whitespace-nowrap">
                                     @if(!empty($cufFull))
-                                        <div class="inline-flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded border border-slate-200">
-                                            <span class="font-mono text-[11px] text-slate-700" title="{{ $cufFull }}">{{ $cufShort }}</span>
+                                        <div class="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm transition-colors">
+                                            <span class="font-mono text-[11px] font-medium text-slate-700 select-all" title="{{ $cufFull }}">{{ $cufShort }}</span>
                                             <button type="button" 
-                                                    @click="navigator.clipboard.writeText('{{ $cufFull }}'); copiedCufId = '{{ $invoice['id'] }}'; setTimeout(() => copiedCufId = null, 2000)"
-                                                    class="inline-flex items-center justify-center p-1 text-slate-400 hover:text-sky-600 hover:bg-slate-200/50 rounded transition-colors"
-                                                    title="Copiar CUF completo">
-                                                <svg x-show="copiedCufId !== '{{ $invoice['id'] }}'" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                                                <svg x-show="copiedCufId === '{{ $invoice['id'] }}'" style="display: none;" class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                    @click.stop="navigator.clipboard.writeText('{{ $cufFull }}'); copiedCufId = '{{ $invoice['id'] }}'; setTimeout(() => copiedCufId = null, 2000)"
+                                                    class="inline-flex items-center justify-center p-1 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded transition-all focus:outline-none"
+                                                    title="Copiar CUF completo al portapapeles">
+                                                <svg x-show="copiedCufId !== '{{ $invoice['id'] }}'" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                                </svg>
+                                                <svg x-show="copiedCufId === '{{ $invoice['id'] }}'" style="display: none;" class="w-3.5 h-3.5 text-emerald-600 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                                </svg>
                                             </button>
                                         </div>
                                     @else
@@ -221,27 +254,27 @@
                                     {{ \Illuminate\Support\Str::limit($invoice['nombreRazonSocial'], 22, '...') }}
                                 </td>
 
-                                <!-- NIT / N° Documento -->
-                                <td class="px-3 py-3 text-xs text-slate-600 font-mono whitespace-nowrap">
-                                    {{ $invoice['numeroDocumento'] ?? '-' }}
+                                <!-- NIT / N° Documento (<tipo doc>;<num doc>) -->
+                                <td class="px-3 py-3 text-xs font-mono whitespace-nowrap">
+                                    <div class="inline-flex items-center gap-1">
+                                        <span class="font-semibold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded text-[11px] border border-slate-200">{{ $docTypeLabel }}</span>
+                                        <span class="text-slate-400 font-bold">;</span>
+                                        <span class="text-slate-800 font-medium">{{ $invoice['numeroDocumento'] ?? '-' }}</span>
+                                    </div>
                                 </td>
 
-                                <!-- Monto & Balance Pendiente -->
+                                <!-- Monto & Balance Pendiente (Pagado / Por cobrar) -->
                                 <td class="px-3 py-3 text-xs whitespace-nowrap">
                                     <div class="flex flex-col">
                                         <span class="font-bold text-slate-900">Bs. {{ number_format($amountVal, 2) }}</span>
                                         <div class="mt-0.5">
                                             @if($balanceVal <= 0)
-                                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700">
-                                                    Pagada
-                                                </span>
-                                            @elseif($balanceVal > 0 && $balanceVal < $amountVal)
-                                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-semibold bg-amber-50 text-amber-700" title="Saldo pendiente: Bs. {{ number_format($balanceVal, 2) }}">
-                                                    Parcial (Bs. {{ number_format($balanceVal, 2) }})
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                    Pagado
                                                 </span>
                                             @else
-                                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-semibold bg-rose-50 text-rose-700" title="Saldo pendiente: Bs. {{ number_format($balanceVal, 2) }}">
-                                                    Impaga (Bs. {{ number_format($balanceVal, 2) }})
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200" title="Saldo pendiente: Bs. {{ number_format($balanceVal, 2) }}">
+                                                    Por cobrar (Bs. {{ number_format($balanceVal, 2) }})
                                                 </span>
                                             @endif
                                         </div>
@@ -260,7 +293,7 @@
                                 <!-- Acciones Dropdown -->
                                 <td class="px-3 py-3 text-center whitespace-nowrap">
                                     <div class="relative inline-block text-left" x-data="{ isOpen: false }">
-                                        <button @click="isOpen = !isOpen" 
+                                        <button @click.stop="isOpen = !isOpen" 
                                                 class="inline-flex items-center justify-center w-8 h-8 text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-200 transition-colors focus:outline-none shadow-sm" 
                                                 type="button"
                                                 title="Acciones de la factura"> 
@@ -353,8 +386,14 @@
     <!-- Edit Invoice Modal Component -->
     @livewire('prepagobags::superadmin.invoice-edit-modal')
     
-    <!-- PDF Viewer Modal -->
-    <div x-show="pdfModalOpen" 
+    <!-- PDF Viewer Modal (Self-contained Alpine State) -->
+    <div x-data="{ 
+             pdfModalOpen: false, 
+             currentPdfUrl: '', 
+             currentInvoiceId: '' 
+         }"
+         @open-pdf.window="currentPdfUrl = $event.detail.url; currentInvoiceId = $event.detail.id; pdfModalOpen = true"
+         x-show="pdfModalOpen" 
          style="display: none;"
          class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/75 backdrop-blur-sm"
          x-transition:enter="ease-out duration-300"

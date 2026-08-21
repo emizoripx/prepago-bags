@@ -115,7 +115,7 @@ class InvoicesAdminTable extends Component
             $cursor = $next ? $this->nextCursor : $this->previousCursor;
         }
 
-        $invoices = Invoice::query()
+        $invoices = Invoice::withTrashed()
             ->join('fel_invoice_requests', 'fel_invoice_requests.id_origin', 'invoices.id')
             ->whereExists(function ($query) {
                 $query->from('fel_invoice_requests')
@@ -130,6 +130,9 @@ class InvoicesAdminTable extends Component
                     ->when($this->estado, function ($q) {
                         if ($this->estado == "904") {
                             return $q->whereIn('fel_invoice_requests.codigoEstado', [904, 908]);
+                        }
+                        if ($this->estado == "905" || $this->estado == "691") {
+                            return $q->whereIn('fel_invoice_requests.codigoEstado', [905, 691]);
                         }
                         return $q->where('fel_invoice_requests.codigoEstado', $this->estado);
                     })
@@ -187,6 +190,7 @@ class InvoicesAdminTable extends Component
             'fel_invoice_requests.fechaEmision',
             'fel_invoice_requests.nombreRazonSocial',
             'fel_invoice_requests.numeroDocumento',
+            'fel_invoice_requests.codigoTipoDocumentoIdentidad',
             'fel_invoice_requests.numeroFactura',
             'fel_invoice_requests.type_document_sector_id',
             'fel_invoice_requests.cuf',
