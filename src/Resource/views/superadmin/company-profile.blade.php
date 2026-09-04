@@ -1,6 +1,6 @@
 @extends('prepagobags::layouts.app')
 @php
-    $settings = json_decode($company->settings);
+    $settings = is_string($company->settings) ? json_decode($company->settings) : (object)($company->settings ?? []);
     $companyName = $settings->name ?? 'Compañía';
     $nitNumber = $settings->id_number ?? '-';
     $logoUrl = $settings->company_logo ?? null;
@@ -8,6 +8,7 @@
         $logoUrl = url($logoUrl);
     }
     $customReports = $settings->custom_reports ?? [];
+    $isPartner = !empty($settings->is_b2b2b_partner) && ($settings->is_b2b2b_partner == true || $settings->is_b2b2b_partner == 1);
 @endphp
 
 @section('meta_title', "Perfil: " . $companyName)
@@ -18,6 +19,13 @@
             @foreach($errors->all() as $error)
             <p>{{ $error }}</p>
             @endforeach
+        </div>
+    @endif
+
+    @if(session('message'))
+        <div style="background-color: #ecfdf5; border: 1px solid #10b981; color: #047857; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;">
+            <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            {{ session('message') }}
         </div>
     @endif
 @endsection
@@ -101,6 +109,38 @@
                     <span>{{ !empty($logoUrl) ? 'Cambiar Logo' : 'Subir Logo' }}</span>
                 </button>
 
+                <!-- Credenciales / Migración -->
+                @if($isPartner)
+                    <button type="button" 
+                            onclick="Livewire.emit('openMigrateToPartnerModal', {{ $company->id }})" 
+                            style="display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.5rem 0.875rem; border-radius: 0.625rem; font-size: 0.75rem; font-weight: 600; background: #7e22ce; border: none; color: #ffffff; cursor: pointer; box-shadow: 0 1px 2px rgba(126,34,206,0.25); transition: background 0.15s ease;"
+                            title="Actualizar credenciales Partner">
+                        <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span>Credenciales Partner</span>
+                    </button>
+                @else
+                    <button type="button" 
+                            onclick="Livewire.emit('openEditFelCredentialsModal', {{ $company->id }})" 
+                            style="display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.5rem 0.875rem; border-radius: 0.625rem; font-size: 0.75rem; font-weight: 600; background: #0284c7; border: none; color: #ffffff; cursor: pointer; box-shadow: 0 1px 2px rgba(2,132,199,0.25); transition: background 0.15s ease;"
+                            title="Ver / Configurar Credenciales FEL directas">
+                        <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                        </svg>
+                        <span>Credenciales FEL</span>
+                    </button>
+                    <button type="button" 
+                            onclick="Livewire.emit('openMigrateToPartnerModal', {{ $company->id }})" 
+                            style="display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.5rem 0.875rem; border-radius: 0.625rem; font-size: 0.75rem; font-weight: 600; background: #9333ea; border: none; color: #ffffff; cursor: pointer; box-shadow: 0 1px 2px rgba(147,51,234,0.25); transition: background 0.15s ease;"
+                            title="Migrar a conexión Partner B2B2B">
+                        <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span>Migrar a Partner</span>
+                    </button>
+                @endif
+
                 <!-- Ingresar como Cliente -->
                 <a href="{{ route('admin.companies.impersonate', $company->company_id) }}" 
                    style="display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.5rem 0.875rem; border-radius: 0.625rem; font-size: 0.75rem; font-weight: 600; background: #059669; border: none; color: #ffffff; cursor: pointer; text-decoration: none; box-shadow: 0 1px 2px rgba(5,150,105,0.25); transition: background 0.15s ease;">
@@ -165,8 +205,13 @@
     <div x-show="currentTab === 'templates'" style="display: none;">
         <livewire:company-templates-tab :company_id="$company->id" />
     </div>
+    <div x-show="currentTab === 'documents'" style="display: none;">
+        <livewire:company-documents-tab :company_id="$company->id" />
+    </div>
 
-    <!-- Standalone Livewire Logo Upload Modal -->
+    <!-- Standalone Livewire Modals -->
     <livewire:upload-company-logo-modal />
+    <livewire:migrate-to-partner-modal />
+    <livewire:edit-fel-credentials-modal />
 </div>
 @endsection

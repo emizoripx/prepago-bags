@@ -7,7 +7,8 @@
             @foreach($errors->all() as $error)
             <p>{{ $error }}</p>
             @endforeach
-        </div>
+            <livewire:prepagobags::superadmin.migrate-to-partner-modal />
+    </div>
     @endif
 @endsection
 
@@ -17,5 +18,6 @@
         
         <livewire:company-table /> 
         <livewire:prepagobags::superadmin.create-company-modal />
+        <livewire:prepagobags::superadmin.migrate-to-partner-modal />
     </div>
 @endsection
