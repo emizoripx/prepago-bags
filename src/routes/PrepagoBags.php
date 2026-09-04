@@ -11,6 +11,7 @@ class PrepagoBags {
     public static function routes(){
 
         Route::group(['namespace' => "\EmizorIpx\PrepagoBags\Http\Controllers"],function () {
+            Route::post('api/webhooks/partner/events', 'PartnerWebhookReceiverController@handle');
             Route::get('prepago_bags/purchase/{prepago_bag_id}', 'PurchasePrepagoBagController@get');
             
             Route::post('prepago_bags', 'PrepagoBagController@store');
@@ -41,6 +42,10 @@ class PrepagoBags {
         Route::group(['namespace' => "\EmizorIpx\PrepagoBags\Http\Controllers"], function () {
                 
             Route::get('dashboard', 'DashboardController@dashboard')->name('admin.dashboard');
+            
+            Route::get('dashboard/partner-settings', 'DashboardController@partnerSettings')->name('admin.partner.settings');
+            Route::post('dashboard/partner-settings', 'DashboardController@updatePartnerSettings')->name('admin.partner.settings.update');
+            Route::post('dashboard/test-partner-connection', 'DashboardController@testPartnerConnection')->name('admin.partner.settings.test');
             
             Route::get('dashboard/companies', 'DashboardController@companies')->name('admin.companies');
             Route::get('dashboard/invoices', 'DashboardController@invoices')->name('admin.invoices');

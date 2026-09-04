@@ -26,6 +26,11 @@
             "icon" => "invoices",
             "title" => "Facturas",
         ],
+        [
+            "url" => "admin.partner.settings",
+            "icon" => "settings",
+            "title" => "Configuración Partner",
+        ],
     ];
 
     $companyName = isset($company) && isset($company->settings) ? (json_decode($company->settings)->name ?? 'Compañía') : 'Compañía';
@@ -236,6 +241,17 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
                     </svg>
                     <span>Plantillas</span>
+                </a>
+
+                <!-- 11. Documentos Sectoriales -->
+                <a href="{{ route('admin.companies.profile', [$company->id, 'tab' => 'documents']) }}"
+                   @click.prevent="currentTab = 'documents'; window.history.replaceState(null, '', '{{ route('admin.companies.profile', $company->id) }}?tab=documents')"
+                   class="pb-sidebar-link px-4 py-2 flex flex-row items-center rounded mx-2 text-xs cursor-pointer"
+                   :class="{ 'active': currentTab === 'documents' }">
+                    <svg class="w-4 h-4 mr-3 flex-shrink-0" :style="currentTab === 'documents' ? 'color: #38bdf8;' : 'color: #9ca3af;'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <span>Documentos</span>
                 </a>
             </div>
         @else

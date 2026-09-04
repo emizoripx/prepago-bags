@@ -2,6 +2,8 @@
 
 namespace EmizorIpx\PrepagoBags\Http\Controllers;
 
+use EmizorIpx\PrepagoBags\Models\PartnerConfiguration;
+
 use EmizorIpx\ClientFel\Utils\TypeDocumentSector;
 use EmizorIpx\PrepagoBags\Models\AccountPrepagoBags;
 use EmizorIpx\PrepagoBags\Models\FelCompanyDocumentSector;
@@ -23,6 +25,34 @@ class DashboardController extends Controller
         $request_quantity = Company::count();
 
         return view('prepagobags::superadmin.dashboard', compact('enrolled_quantity', 'trial_quantity', 'request_quantity'));
+    }
+
+    public function partnerSettings()
+    {
+        $testingConfig = PartnerConfiguration::getConfig('testing');
+        $productionConfig = PartnerConfiguration::getConfig('production');
+
+        $partner_token_testing = $testingConfig['partner_token'] ?? '';
+        $api_url_testing = $testingConfig['api_url'] ?? '';
+        $partner_token_production = $productionConfig['partner_token'] ?? '';
+        $api_url_production = $productionConfig['api_url'] ?? '';
+
+        $partner_logs = [];
+        $partner_webhook_count = 0;
+        $partner_api_count = 0;
+        
+        $partner_webhooks = [
+            url('api/webhooks/partner/events'),
+            url('webhook/status-invoice'),
+            url('webhook/update-branch'),
+            url('webhook/update-pos'),
+            url('webhook/update-parametrics'),
+            url('webhook/status-package'),
+            url('webhook/update-templates'),
+            url('webhook/update-documents'),
+        ];
+
+        return view('prepagobags::superadmin.partner-settings', compact('partner_token_testing', 'api_url_testing', 'partner_token_production', 'api_url_production', 'partner_logs', 'partner_webhook_count', 'partner_api_count', 'partner_webhooks'));
     }
 
     public function companies()
@@ -364,6 +394,83 @@ class DashboardController extends Controller
             $user->save();
             
             return response()->json(["status"=>true, "messages"=> "actualizado satisfactoriamente", "user" => $user->email_verified_at]);    
+        }
+    }
+
+    public function updatePartnerSettings(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'api_url_testing' => 'nullable|url',
+            'partner_token_testing' => 'nullable|string',
+            'api_url_production' => 'nullable|url',
+            'partner_token_production' => 'nullable|string',
+        ]);
+
+        try {
+            $apiUrlTesting = trim($request->input('api_url_testing', ''));
+            $partnerTokenTesting = trim($request->input('partner_token_testing', ''));
+            $apiUrlProduction = trim($request->input('api_url_production', ''));
+            $partnerTokenProduction = trim($request->input('partner_token_production', ''));
+
+            PartnerConfiguration::updateConfig(
+                'testing',
+                $apiUrlTesting,
+                $partnerTokenTesting
+            );
+
+            PartnerConfiguration::updateConfig(
+                'production',
+                $apiUrlProduction,
+                $partnerTokenProduction
+            );
+
+            return redirect()->back()->with('message', 'Configuración de Partner actualizada exitosamente en Base de Datos.');
+        } catch (\Exception $e) {
+            \Log::error("Error guardando Partner Settings: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al guardar configuración: ' . $e->getMessage());
+        }
+    }
+
+    public function testPartnerConnection(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'partner_token' => 'required|string',
+            'api_url' => 'required|url',
+        ]);
+
+        try {
+            $apiUrl = rtrim(trim($request->input('api_url')), '/');
+            $client = new \GuzzleHttp\Client([
+                'base_uri' => $apiUrl,
+                'timeout'  => 5.0,
+                'verify'   => false, // Optional for local testing with self-signed SSL
+            ]);
+
+            // Realizamos un ping a la raiz, asumiendo que el dominio debe responder algo (404, 200, etc) y no lanzar error de red/DNS.
+            $response = $client->request('GET', '/');
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Conexión exitosa. El Host es accesible.'
+            ]);
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            // If it's an HTTP error (4xx, 5xx) but connection worked, it's still "reachable" to some extent.
+            if ($e->hasResponse()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Host accesible (Respondió HTTP ' . $e->getResponse()->getStatusCode() . ').'
+                ]);
+            }
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo conectar al Host: ' . $e->getMessage()
+            ]);
+        } catch (\Exception $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de conexión: ' . $ex->getMessage()
+            ]);
         }
     }
 }
