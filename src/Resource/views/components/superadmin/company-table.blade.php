@@ -48,6 +48,16 @@
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                 </div>
+                <div class="relative w-full md:w-52 ml-0 md:ml-3 mt-3 md:mt-0">
+                    <select wire:model="connectionType" class="w-full rounded-xl border border-slate-200 appearance-none bg-slate-50 text-slate-600 text-xs py-2.5 px-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 focus:bg-white transition-all font-medium">
+                        <option value="todos">Todas las conexiones</option>
+                        <option value="partner">Conexión Partner</option>
+                        <option value="individual">Conexión Individual</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
             @endslot
         @endcomponent
     </div>
@@ -72,6 +82,9 @@
                                 </th>
                                 <th scope="col" class="px-3 py-3 text-xs font-semibold tracking-wider text-left text-white uppercase">
                                     Fase SIAT
+                                </th>
+                                <th scope="col" class="px-3 py-3 text-xs font-semibold tracking-wider text-left text-white uppercase">
+                                    Conexión
                                 </th>
                                 <th scope="col" class="px-3 py-3 text-xs font-semibold tracking-wider text-left text-white uppercase">
                                     Administrador
@@ -127,6 +140,17 @@
                                     </span>
                                 </td>
                                 <td class="px-3 py-3 text-xs whitespace-nowrap">
+                                    @if($company->is_b2b2b_partner == "true" || $company->is_b2b2b_partner == 1)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 ring-1 ring-purple-600/20">
+                                            Partner
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 ring-1 ring-slate-500/20">
+                                            Individual
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-xs whitespace-nowrap">
                                     <div class="inline-flex items-center gap-2">
                                         <div class="w-6 h-6 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-[10px]">
                                             {{ strtoupper(substr($company->first_name, 0, 1)) }}
@@ -180,6 +204,12 @@
                                                 </a>
                                             </div>
                                             <div class="pt-1">
+                                                <button type="button" 
+                                                        class="flex items-center w-full px-4 py-2.5 text-xs font-medium text-purple-700 hover:bg-purple-50 transition-colors gap-2.5" 
+                                                        onclick="Livewire.emit('openMigrateToPartnerModal', {{ $company->id }})">
+                                                    <svg class="w-4 h-4 text-purple-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                                    <span>{{ ($company->is_b2b2b_partner == 'true' || $company->is_b2b2b_partner == 1) ? 'Actualizar Partner' : 'Migrar a Partner' }}</span>
+                                                </button>
                                                 <button type="button" 
                                                         class="flex items-center w-full px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-700 transition-colors gap-2.5" 
                                                         onclick="Livewire.emit('openModal', 'piloto-up', [{{$company->id}}])">

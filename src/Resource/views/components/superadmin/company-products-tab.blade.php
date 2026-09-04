@@ -41,13 +41,16 @@
                         {{ number_format($product->price, 2) }}
                     </td>
                     <td class="px-3 py-3 whitespace-nowrap text-xs">
-                        @if($product->fel_product && !empty($product->fel_product->codigo_product_sin))
+                        @if(!empty($product->codigo_producto_sin))
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20">
                                 Homologado
                             </span>
                             <div class="mt-1 text-[11px] text-slate-400 font-normal space-y-0.5">
-                                <div><span class="font-medium text-slate-500">Cód. SIN:</span> {{ $product->fel_product->codigo_product_sin }}</div>
-                                <div><span class="font-medium text-slate-500">Unidad:</span> {{ $product->fel_product->nombre_unidad ?? $product->fel_product->codigo_unidad }}</div>
+                                <div><span class="font-medium text-slate-500">Cód. SIN:</span> <span class="font-mono text-slate-700">{{ $product->codigo_producto_sin }}</span></div>
+                                @if(!empty($product->codigo_actividad_economica))
+                                    <div><span class="font-medium text-slate-500">Actividad:</span> <span class="font-mono text-slate-700">{{ $product->codigo_actividad_economica }}</span></div>
+                                @endif
+                                <div><span class="font-medium text-slate-500">Unidad:</span> {{ $product->nombre_unidad ?: ($product->codigo_unidad ?: 'UNIDAD') }}</div>
                             </div>
                         @else
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">

@@ -39,6 +39,52 @@ class CompanyTemplatesTab extends Component
         return view('prepagobags::components.superadmin.company-templates-tab', compact('templates'));
     }
 
+    public function syncTemplates()
+    {
+        try {
+            $company = \App\Models\Company::find($this->company_id);
+            if (!$company) {
+                session()->flash('sync_error', "No se encontró la empresa.");
+                return;
+            }
+
+            $companyPrepago = \EmizorIpx\PrepagoBags\Models\AccountPrepagoBags::where('company_id', $this->company_id)->first();
+            $isPartner = !empty($company->settings->is_b2b2b_partner);
+
+            if ($isPartner) {
+                $phase = ($companyPrepago && $companyPrepago->phase === 'Production') ? 'production' : 'testing';
+                $partnerService = new \EmizorIpx\PrepagoBags\Services\PartnerOnboardingService($phase);
+                
+                if (!$partnerService->hasToken()) {
+                    session()->flash('sync_error', "El Partner Token para ambiente '$phase' no está configurado.");
+                    return;
+                }
+
+                $tenantKey = $company->settings->tenant_id ?? ($company->settings->id_number ?? $company->id);
+                $partnerService->syncTemplates($tenantKey, $this->company_id);
+                session()->flash('sync_message', "Plantillas sincronizadas correctamente desde el Partner.");
+            } else {
+                if (!$companyPrepago || !$companyPrepago->fel_company_token) {
+                    session()->flash('sync_error', "No se encontraron credenciales FEL locales para esta empresa.");
+                    return;
+                }
+
+                $credentials_repo = new \EmizorIpx\ClientFel\Repository\FelCredentialRepository();
+                $credentials_repo
+                    ->setCredentials($companyPrepago->fel_company_token->client_id, $companyPrepago->fel_company_token->client_secret)
+                    ->setHost($companyPrepago->fel_company_token->getHost())
+                    ->setCompanyId($this->company_id)
+                    ->getTemplates();
+
+                session()->flash('sync_message', "Plantillas sincronizadas correctamente.");
+            }
+            $this->resetPage();
+        } catch (\Exception $e) {
+            \Log::error("Error sincronizando plantillas en CompanyTemplatesTab: " . $e->getMessage());
+            session()->flash('sync_error', "Error al sincronizar plantillas: " . $e->getMessage());
+        }
+    }
+
     public function downloadTemplate($id)
     {
         $template = DB::table('fel_templates')->find($id);

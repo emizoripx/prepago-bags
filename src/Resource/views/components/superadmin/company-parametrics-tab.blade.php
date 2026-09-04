@@ -18,15 +18,22 @@
             </button>
         </div>
 
-        <div class="w-full sm:w-64">
-            <div class="relative">
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+            <button onclick="if(confirm('¿Estás seguro de forzar la sincronización? Esto ignorará la fecha de última actualización y descargará todos los registros nuevamente.')) { @this.call('forceSyncParametrics') }" wire:loading.attr="disabled" 
+                class="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl transition-colors bg-sky-50 text-sky-600 hover:bg-sky-100 border border-sky-200/50">
+                <svg wire:loading.remove wire:target="forceSyncParametrics" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                <svg wire:loading wire:target="forceSyncParametrics" class="w-3.5 h-3.5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <span wire:loading.remove wire:target="forceSyncParametrics">Forzar Sinc.</span>
+                <span wire:loading wire:target="forceSyncParametrics">Sincronizando...</span>
+            </button>
+            <div class="w-full sm:w-64 relative">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <svg class="w-3.5 h-3.5 text-slate-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                     </svg>
                 </div>
                 <input wire:model.debounce.500ms="search" type="search" class="block w-full py-2 pl-9 pr-8 text-xs text-slate-900 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-colors" placeholder="Buscar...">
-                <div wire:loading class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <div wire:loading wire:target="search" class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                     <svg class="w-3.5 h-3.5 text-sky-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -35,6 +42,19 @@
             </div>
         </div>
     </div>
+    
+    @if(session()->has('sync_message'))
+        <div class="px-5 py-2 bg-emerald-50 text-emerald-600 text-xs font-semibold border-b border-emerald-100 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            {{ session('sync_message') }}
+        </div>
+    @endif
+    @if(session()->has('sync_error'))
+        <div class="px-5 py-2 bg-rose-50 text-rose-600 text-xs font-semibold border-b border-rose-100 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            {{ session('sync_error') }}
+        </div>
+    @endif
 
     <!-- Table -->
     <div class="relative overflow-x-auto min-h-[300px]">

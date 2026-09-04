@@ -57,6 +57,8 @@ class PrepagoBagsServiceProvider extends ServiceProvider
             ]);
         }
 
+        config(['livewire.temporary_file_upload.disk' => env('LIVEWIRE_TMP_DISK', 'local')]);
+
         // Migrations
         Paginator::useBootstrap();
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
@@ -107,5 +109,13 @@ class PrepagoBagsServiceProvider extends ServiceProvider
         Livewire::component('prepagobags::superadmin.create-company-modal', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CreateCompanyModal::class);
         Livewire::component('upload-company-logo-modal', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\UploadCompanyLogoModal::class);
         Livewire::component('prepagobags::superadmin.upload-company-logo-modal', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\UploadCompanyLogoModal::class);
+        Livewire::component('company-onboarding-status', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanyOnboardingStatus::class);
+        Livewire::component('prepagobags::superadmin.company-onboarding-status', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanyOnboardingStatus::class);
+        Livewire::component('company-documents-tab', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanyDocumentsTab::class);
+        Livewire::component('prepagobags::superadmin.company-documents-tab', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\CompanyDocumentsTab::class);
+        Livewire::component('migrate-to-partner-modal', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\MigrateToPartnerModal::class);
+        Livewire::component('prepagobags::superadmin.migrate-to-partner-modal', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\MigrateToPartnerModal::class);
+        Livewire::component('edit-fel-credentials-modal', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\EditFelCredentialsModal::class);
+        Livewire::component('prepagobags::superadmin.edit-fel-credentials-modal', \EmizorIpx\PrepagoBags\Http\Livewire\Superadmin\EditFelCredentialsModal::class);
     }
 }

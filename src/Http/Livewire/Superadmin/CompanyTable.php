@@ -25,6 +25,7 @@ class CompanyTable extends Component
     protected $listeners = ['companyCreated' => '$refresh'];
 
     public string $phase = "todos";
+    public string $connectionType = "todos";
     public string $search = "";
 
     public int $per_page = 10;
@@ -46,6 +47,10 @@ class CompanyTable extends Component
     {
         $this->resetPage();
     }
+    public function updatingConnectionType()
+    {
+        $this->resetPage();
+    }
 
 
     public function getCompanies()
@@ -54,7 +59,7 @@ class CompanyTable extends Component
                     ->join('company_user', 'company_user.company_id', 'companies.id')
                     ->leftJoin('users', 'users.id', 'company_user.user_id')
                     ->where('company_user.is_owner', 1)
-                    ->select('companies.id', \DB::raw('json_extract(companies.settings,"$.name") as company_name'), \DB::raw('json_extract(companies.settings,"$.id_number") as company_id_number'), \DB::raw('json_extract(companies.settings,"$.company_logo") as company_logo'), 'fel_company.company_id' ,'companies.created_at' ,'fel_company.production', 'fel_company.is_postpago', 'fel_company.enabled','fel_company.phase',  'users.first_name', 'users.last_name', 'users.phone', 'users.email');
+                    ->select('companies.id', \DB::raw('json_extract(companies.settings,"$.name") as company_name'), \DB::raw('json_extract(companies.settings,"$.id_number") as company_id_number'), \DB::raw('json_extract(companies.settings,"$.company_logo") as company_logo'), \DB::raw('json_extract(companies.settings,"$.is_b2b2b_partner") as is_b2b2b_partner'), 'fel_company.company_id' ,'companies.created_at' ,'fel_company.production', 'fel_company.is_postpago', 'fel_company.enabled','fel_company.phase',  'users.first_name', 'users.last_name', 'users.phone', 'users.email');
 
         if ($this->search != "") {
             $query = $query->where(function($q) {
@@ -67,6 +72,15 @@ class CompanyTable extends Component
 
         if($this->phase != "todos") {
             $query = $query->where('fel_company.phase',$this->phase);
+        }
+
+        if ($this->connectionType == "partner") {
+            $query = $query->whereRaw('json_extract(companies.settings,"$.is_b2b2b_partner") = true');
+        } elseif ($this->connectionType == "individual") {
+            $query = $query->where(function($q) {
+                $q->whereRaw('json_extract(companies.settings,"$.is_b2b2b_partner") = false')
+                  ->orWhereNull(\DB::raw('json_extract(companies.settings,"$.is_b2b2b_partner")'));
+            });
         }
 
         $query = $query->orderBy($this->sort_field, $this->sort_asc ? 'asc' : 'desc');

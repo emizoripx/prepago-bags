@@ -5,8 +5,12 @@ namespace EmizorIpx\PrepagoBags\Http\Livewire\Superadmin;
 use EmizorIpx\PrepagoBags\Models\AccountPrepagoBags;
 use EmizorIpx\PrepagoBags\Models\CompanyStatistic;
 use EmizorIpx\PrepagoBags\Models\FelCompanyDocumentSector;
+use EmizorIpx\PrepagoBags\Models\PartnerConfiguration;
 use EmizorIpx\PrepagoBags\Models\PostpagoPlanCompany;
 use EmizorIpx\PrepagoBags\Models\PrepagoBagsPayment;
+use EmizorIpx\ClientFel\Models\FelParametric;
+use EmizorIpx\ClientFel\Services\Parametrics\Parametric;
+use EmizorIpx\ClientFel\Utils\TypeParametrics;
 use Livewire\Component;
 use DB;
 
@@ -14,9 +18,67 @@ class CompanyInformationTab extends Component
 {
     public $company_id;
 
+    protected $listeners = ['credentialsUpdated' => '$refresh'];
+
     public function mount($company_id)
     {
         $this->company_id = $company_id;
+    }
+
+    public function syncDocumentSectors()
+    {
+        try {
+            $company = \App\Models\Company::find($this->company_id);
+            if (!$company) {
+                session()->flash('sync_error', "No se encontró la empresa.");
+                return;
+            }
+
+            $companyPrepago = AccountPrepagoBags::where('company_id', $this->company_id)->first();
+            if (!$companyPrepago) {
+                session()->flash('sync_error', "No se encontró configuración de facturación para esta empresa.");
+                return;
+            }
+
+            $isPartner = !empty($company->settings->is_b2b2b_partner);
+            $phase = ($companyPrepago->phase === 'Production') ? 'production' : 'testing';
+
+            if ($isPartner) {
+                $partnerConfig = PartnerConfiguration::getConfig($phase);
+                $host = rtrim($partnerConfig['api_url'] ?? '', '/');
+                $token = $partnerConfig['partner_token'] ?? '';
+                $tenantKey = $company->settings->tenant_id ?? ($company->settings->id_number ?? $company->id);
+
+                if (empty($token)) {
+                    session()->flash('sync_error', "El Partner Token para ambiente '$phase' no está configurado.");
+                    return;
+                }
+
+                $parametricService = new Parametric($token, $host, $tenantKey);
+            } else {
+                if (!$companyPrepago->fel_company_token) {
+                    session()->flash('sync_error', "No se encontraron credenciales FEL locales para esta empresa.");
+                    return;
+                }
+
+                $host = $companyPrepago->fel_company_token->getHost();
+                $token = $companyPrepago->fel_company_token->getAccessToken();
+                $parametricService = new Parametric($token, $host);
+            }
+
+            $parametricService->get(TypeParametrics::TIPOS_DOCUMENTO_SECTOR, '', true);
+            $response = $parametricService->getResponse();
+
+            if (!empty($response) && is_array($response)) {
+                FelParametric::saveParametrics(TypeParametrics::TIPOS_DOCUMENTO_SECTOR, $this->company_id, $response, true);
+            }
+
+            $companyPrepago->service()->registerCompanySectorDocuments();
+            session()->flash('sync_message', "Documentos sectoriales sincronizados y disponibilidad actualizada.");
+        } catch (\Exception $e) {
+            \Log::error("Error sincronizando documentos sector en CompanyInformationTab: " . $e->getMessage());
+            session()->flash('sync_error', "Error al sincronizar documentos sector: " . $e->getMessage());
+        }
     }
 
     public function render()
@@ -25,6 +87,8 @@ class CompanyInformationTab extends Component
             ->select('companies.id', 'fel_company.company_id', 'fel_company.client_id', 'fel_company.production', 'fel_company.is_postpago', 'companies.settings')
             ->where('companies.id', $this->company_id)
             ->first();
+
+        $fel_token = \EmizorIpx\ClientFel\Models\FelClientToken::where('account_id', $this->company_id)->first();
 
         $document_sectors = FelCompanyDocumentSector::whereCompanyId($this->company_id)->get(['invoice_number_available', 'accumulative', 'duedate', 'fel_doc_sector_id', 'counter', 'postpago_limit', 'postpago_exceded_limit', 'postpago_counter']);
 
@@ -67,6 +131,6 @@ class CompanyInformationTab extends Component
             $company_logo = url($company_logo);
         }
 
-        return view('prepagobags::components.superadmin.company-information-tab', compact('company', 'document_sectors', 'arrayNames', 'post_pago_plan_companies', 'stats', 'sum_all_documents', 'due_invoices', 'prepago_bags_payments', 'custom_reports', 'company_logo', 'settings'));
+        return view('prepagobags::components.superadmin.company-information-tab', compact('company', 'fel_token', 'document_sectors', 'arrayNames', 'post_pago_plan_companies', 'stats', 'sum_all_documents', 'due_invoices', 'prepago_bags_payments', 'custom_reports', 'company_logo', 'settings'));
     }
 }
