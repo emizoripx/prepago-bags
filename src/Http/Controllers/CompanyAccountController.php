@@ -80,15 +80,37 @@ class CompanyAccountController extends Controller
             // RESET COUNTERS
             $this->purgeFeldataService->resetNumbersCounter($company);
 
-            // ACTUALIZA LAS CREDENCIALES Y OBTIENE LAS PARAMETRICAS
-            $this->credentials_repo
-            ->setCredentials($data['client_id'], $data['client_secret'])
-            ->setHost($data['host'])
-            ->setCompanyId($company_id)
-            ->register()
-            ->updateFelCompany()
-            ->syncParametrics()
-            ->getBranches();
+            // ACTUALIZA CON PARTNER API O FALLBACK A CREDENCIALES
+            $isPartner = !empty($company->settings->is_b2b2b_partner) && ($company->settings->is_b2b2b_partner === true || $company->settings->is_b2b2b_partner === 'true' || $company->settings->is_b2b2b_partner === 1 || $company->settings->is_b2b2b_partner === '1');
+            $partnerService = new \EmizorIpx\PrepagoBags\Services\PartnerOnboardingService('testing');
+            if ($isPartner && $partnerService->hasToken()) {
+                $registerResponse = $partnerService->registerCompany($company, [
+                    'environment_code' => 1,
+                ]);
+                $tenantId = $registerResponse['tenant_id'] ?? ($company->settings->id_number ?? $company->id);
+                $partnerService->beginOperations($tenantId);
+                $partnerService->syncParametrics($tenantId);
+                try {
+                    $partnerService->syncCompanyDetailsAndBranches($tenantId, $company_id);
+                    $partnerService->syncTemplates($tenantId, $company_id);
+                } catch (\Exception $ex) {
+                    \Log::warning("No se pudo sincronizar sucursales/templates del partner en pilotUp: " . $ex->getMessage());
+                }
+            } else {
+                $clientId = $data['client_id'] ?? config('clientfel.client_id_demo');
+                $clientSecret = $data['client_secret'] ?? config('clientfel.client_secret_demo');
+                $host = $data['host'] ?? config('clientfel.host_demo');
+
+                $this->credentials_repo
+                    ->setCredentials($clientId, $clientSecret)
+                    ->setHost($host)
+                    ->setCompanyId($company_id)
+                    ->register()
+                    ->updateFelCompany()
+                    ->syncParametrics()
+                    ->getBranches()
+                    ->getTemplates();
+            }
 
             // CAMBIA A PRUEBAS PILOTO
             $companyAccount->update([
@@ -180,14 +202,36 @@ class CompanyAccountController extends Controller
             $this->purgeFeldataService->resetNumbersCounter($company);
             \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> counters reset");
             
-            // ACTUALIZA LAS CREDENCIALES Y OBTIENE LAS PARAMETRICAS
-            $this->credentials_repo
-            ->setCredentials($data['client_id'], $data['client_secret'])
-            ->setHost(config('clientfel.host_production'))
-            ->setCompanyId($company_id)
-            ->register()
-            ->updateFelCompany()
-            ->syncParametrics();
+            // ACTUALIZA CON PARTNER API O FALLBACK A CREDENCIALES
+            $isPartner = !empty($company->settings->is_b2b2b_partner) && ($company->settings->is_b2b2b_partner === true || $company->settings->is_b2b2b_partner === 'true' || $company->settings->is_b2b2b_partner === 1 || $company->settings->is_b2b2b_partner === '1');
+            $partnerService = new \EmizorIpx\PrepagoBags\Services\PartnerOnboardingService('production');
+            if ($isPartner && $partnerService->hasToken()) {
+                $registerResponse = $partnerService->registerCompany($company, [
+                    'environment_code' => 2,
+                ]);
+                $tenantId = $registerResponse['tenant_id'] ?? ($company->settings->id_number ?? $company->id);
+                $partnerService->beginOperations($tenantId);
+                $partnerService->syncParametrics($tenantId);
+                try {
+                    $partnerService->syncCompanyDetailsAndBranches($tenantId, $company_id);
+                    $partnerService->syncTemplates($tenantId, $company_id);
+                } catch (\Exception $ex) {
+                    \Log::warning("No se pudo sincronizar sucursales/templates del partner en productionUp: " . $ex->getMessage());
+                }
+            } else {
+                $clientId = $data['client_id'] ?? config('clientfel.client_id_production', config('clientfel.client_id_demo'));
+                $clientSecret = $data['client_secret'] ?? config('clientfel.client_secret_production', config('clientfel.client_secret_demo'));
+                $host = $data['host'] ?? config('clientfel.host_production');
+
+                $this->credentials_repo
+                    ->setCredentials($clientId, $clientSecret)
+                    ->setHost($host)
+                    ->setCompanyId($company_id)
+                    ->register()
+                    ->updateFelCompany()
+                    ->syncParametrics()
+                    ->getTemplates();
+            }
 
             \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> credentials to connect to fel set up");
             
@@ -216,11 +260,13 @@ class CompanyAccountController extends Controller
                 ->savePostpagoPlan($data['plan_id'], $data['enable_overflow'] ?? null , $data['start_date'] );
                 \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> Plan POSTPAGO setup correctly");
                 
-                try {
-                    $this->credentials_repo->getBranches(true);
-                    \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> PLAN POSTPAGO : Get branches from FEL done");
-                } catch (\Exception $e) {
-                    \Log::warning("Could not sync branches via legacy repo: " . $e->getMessage());
+                if (!$isPartner) {
+                    try {
+                        $this->credentials_repo->getBranches(true);
+                        \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> PLAN POSTPAGO : Get branches from FEL done");
+                    } catch (\Exception $e) {
+                        \Log::warning("Could not sync branches via legacy repo: " . $e->getMessage());
+                    }
                 }
             } else{
                 $company->company_detail->service()
@@ -229,11 +275,13 @@ class CompanyAccountController extends Controller
                 ->saveDuedateAndInvoiceAvailable($data['duedate'], $data['invoice_number_available']);
                 \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> Plan PREPAGO setup correctly");
                 
-                try {
-                    $this->credentials_repo->getBranches();
-                    \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> PLAN PREPAGO : Get branches from FEL done");
-                } catch (\Exception $e) {
-                    \Log::warning("Could not sync branches via legacy repo: " . $e->getMessage());
+                if (!$isPartner) {
+                    try {
+                        $this->credentials_repo->getBranches();
+                        \Log::debug(" PRODUCTION-UP >>>>>>>>>>>>> PLAN PREPAGO : Get branches from FEL done");
+                    } catch (\Exception $e) {
+                        \Log::warning("Could not sync branches via legacy repo: " . $e->getMessage());
+                    }
                 }
             }
 

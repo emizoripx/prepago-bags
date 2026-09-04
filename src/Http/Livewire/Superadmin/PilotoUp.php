@@ -69,6 +69,12 @@ class PilotoUp extends ModalComponent
                 $tenantId = $registerResponse['tenant_id'] ?? ($company->settings->id_number ?? $company->id);
                 $partnerService->beginOperations($tenantId);
                 $partnerService->syncParametrics($tenantId);
+                try {
+                    $partnerService->syncCompanyDetailsAndBranches($tenantId, $this->company_id);
+                    $partnerService->syncTemplates($tenantId, $this->company_id);
+                } catch (\Exception $ex) {
+                    Log::warning("No se pudo sincronizar sucursales/templates del partner en PilotoUp: " . $ex->getMessage());
+                }
             } else {
                 $credentials_repo = app(FelCredentialRepository::class);
                 $credentials_repo
@@ -78,7 +84,8 @@ class PilotoUp extends ModalComponent
                     ->register()
                     ->updateFelCompany()
                     ->syncParametrics()
-                    ->getBranches();
+                    ->getBranches()
+                    ->getTemplates();
             }
 
             // CAMBIA A PRUEBAS PILOTO

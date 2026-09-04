@@ -164,19 +164,30 @@ class CreateCompanyModal extends Component
                 }
             }
 
+            // Asegurar que settings locales contengan name y id_number
+            $companySettings = $company->settings;
+            $companySettings->name = $this->company_name;
+            $companySettings->id_number = $this->id_number;
+            $company->settings = $companySettings;
+            $company->save();
+
             // Partner Onboarding Flow
             $partnerPhase = in_array($this->phase, ['testing', 'piloto']) ? 'testing' : 'production'; 
             $partnerService = new PartnerOnboardingService($partnerPhase);
             
             // Prepare Settings
             $settings = [
+                'name' => $this->company_name,
+                'business_name' => $this->company_name,
+                'nit' => (string) $this->id_number,
                 'environment_code' => $this->phase === 'testing' ? 1 : 2,
-                'system_code' => empty($this->system_code) ? ['DEFAULT'] : [$this->system_code],
-                'is_uniper' => $this->is_unipersonal ? true : false,
+                'system_code' => empty($this->system_code) ? [] : [(string)$this->system_code],
+                'is_uniper' => $this->is_unipersonal ? 1 : 0,
                 'type_document_sectors_codes' => [1],
-                'document_type' => empty($this->document_type) ? 5 : $this->document_type,
-                'modality_code' => $this->billing_type === 'electronica' ? 2 : 1,
+                'document_type' => empty($this->document_type) ? 5 : (int)$this->document_type,
+                'modality_code' => $this->billing_type === 'electronica' ? 1 : 2,
                 'sin_token' => empty($this->sin_token) ? '' : $this->sin_token,
+                'platform' => 'emizor5',
                 
                 // Branch Data Defaults (required by Partner API for Casa Matriz)
                 'branch_code' => 0,
@@ -189,21 +200,18 @@ class CreateCompanyModal extends Component
             if ($partnerService->hasToken()) {
                 // 1. Register Company
                 $registerResponse = $partnerService->registerCompany($company, $settings);
-                $tenantId = $registerResponse['tenant_id'] ?? $this->id_number;
+                $tenantId = $registerResponse['tenant_id'] ?? ($registerResponse['company_key'] ?? $this->id_number);
 
                 // 2. Configure Piloto / Production fields
                 if (in_array($this->phase, ['piloto', 'production'])) {
 
                     // Upload Credentials if needed (Certificate or SIN Token)
-                    $certificateContent = null;
-                    if ($this->billing_type === 'electronica' && $this->certificate_file) {
-                        $certificateContent = file_get_contents($this->certificate_file->getRealPath());
-                    }
+                    $certificate = ($this->billing_type === 'electronica' && $this->certificate_file) ? $this->certificate_file : null;
 
-                    if ($certificateContent || !empty($this->sin_token)) {
+                    if ($certificate || !empty($this->sin_token)) {
                         $partnerService->uploadCredentials(
                             $tenantId, 
-                            $certificateContent, 
+                            $certificate, 
                             $this->certificate_password, 
                             $this->sin_token, 
                             $this->system_code
@@ -219,8 +227,6 @@ class CreateCompanyModal extends Component
 
                 // Local Initialization for Partner Companies
                 try {
-                    $company->company_detail->service()->registerCompanySectorDocuments()->addBagGift();
-
                     // Marcar empresa como cubierta por el partner B2B2B
                     $companySettings = $company->settings;
                     $companySettings->is_b2b2b_partner = true;
@@ -228,17 +234,32 @@ class CreateCompanyModal extends Component
                     $company->settings = $companySettings;
                     $company->save();
 
-                    // Registrar la sucursal localmente
-                    \EmizorIpx\ClientFel\Models\FelBranch::create([
-                        "codigo" => 0,
-                        "descripcion" => "Casa Matriz",
-                        "company_id" => $company->id,
-                        "zona" => "S/N",
-                        "telefono" => "00000000",
-                        "pais" => "Bolivia",
-                        "ciudad" => "La Paz",
-                        "municipio" => "La Paz"
-                    ]);
+                    if (in_array($this->phase, ['piloto', 'production'])) {
+                        try {
+                            $partnerService->syncCompanyDetailsAndBranches($tenantId, $company->id);
+                            $partnerService->syncTemplates($tenantId, $company->id);
+                        } catch (\Exception $syncEx) {
+                            \Log::warning("CreateCompanyModal: no se pudo sincronizar sucursales/templates: " . $syncEx->getMessage());
+                        }
+                    } else {
+                        // Registrar sucursal por defecto en testing
+                        \EmizorIpx\ClientFel\Models\FelBranch::updateOrCreate(
+                            [
+                                "company_id" => $company->id,
+                                "codigo" => 0,
+                            ],
+                            [
+                                "descripcion" => "Casa Matriz",
+                                "zona" => "S/N",
+                                "telefono" => "00000000",
+                                "pais" => "Bolivia",
+                                "ciudad" => "La Paz",
+                                "municipio" => "La Paz"
+                            ]
+                        );
+                    }
+
+                    $company->company_detail->service()->registerCompanySectorDocuments()->addBagGift();
                 } catch(\Exception $ex) {
                     \Log::debug("Problemas al inicializar detalles de compania localmente: " . $ex->getMessage());
                 }
