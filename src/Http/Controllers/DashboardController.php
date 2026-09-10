@@ -15,8 +15,100 @@ use EmizorIpx\PrepagoBags\Models\PostpagoPlanCompany;
 use EmizorIpx\PrepagoBags\Models\PrepagoBagsPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Models\Account;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
+
 class DashboardController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $user = auth()->guard('admin')->user();
+            if (!$user || $user->is_superadmin != 1) {
+                auth()->guard('admin')->logout();
+                return redirect()->route('admin.catchall')->withErrors(['email' => 'Acceso denegado: Se requieren permisos de Super Administrador.']);
+            }
+            return $next($request);
+        });
+    }
+
+    public function administrators()
+    {
+        $administrators = User::where('is_superadmin', 1)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $currentAdmin = auth()->guard('admin')->user();
+
+        return view('prepagobags::superadmin.administrators', compact('administrators', 'currentAdmin'));
+    }
+
+    public function storeAdministrator(Request $request)
+    {
+        $email = trim(strtolower($request->input('email')));
+
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = User::where('email', $email)->first();
+
+        if ($user) {
+            if ($user->is_superadmin == 1) {
+                return redirect()->route('admin.administrators')->with('error', "El usuario {$email} ya cuenta con permisos de Super Administrador.");
+            }
+
+            $user->is_superadmin = 1;
+            $user->save();
+
+            $nombre = trim($user->first_name . ' ' . $user->last_name) ?: $email;
+            return redirect()->route('admin.administrators')->with('message', "El usuario {$nombre} ({$email}) fue promovido a Super Administrador exitosamente.");
+        }
+
+        $request->validate([
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $account = Account::first();
+
+        $newUser = new User();
+        $newUser->account_id = $account ? $account->id : null;
+        $newUser->first_name = $request->input('first_name');
+        $newUser->last_name = $request->input('last_name');
+        $newUser->email = $email;
+        $newUser->password = Hash::make($request->input('password'));
+        $newUser->is_superadmin = 1;
+        $newUser->email_verified_at = Carbon::now();
+        $newUser->phone = $request->input('phone', '');
+        $newUser->save();
+
+        return redirect()->route('admin.administrators')->with('message', "Nuevo Super Administrador {$newUser->first_name} {$newUser->last_name} ({$email}) creado exitosamente.");
+    }
+
+    public function toggleAdministrator(Request $request, $id)
+    {
+        $currentAdmin = auth()->guard('admin')->user();
+
+        $user = User::findOrFail($id);
+
+        if ($user->id === $currentAdmin->id) {
+            return redirect()->route('admin.administrators')->with('error', 'Por seguridad, no puedes revocar tus propios permisos de Super Administrador mientras estás en sesión.');
+        }
+
+        $newStatus = $user->is_superadmin == 1 ? 0 : 1;
+        $user->is_superadmin = $newStatus;
+        $user->save();
+
+        $statusLabel = $newStatus == 1 ? 'activados' : 'revocados';
+        $nombre = trim($user->first_name . ' ' . $user->last_name) ?: $user->email;
+
+        return redirect()->route('admin.administrators')->with('message', "Permisos de Super Administrador {$statusLabel} para {$nombre} ({$user->email}).");
+    }
+
 
     public function dashboard()
     {

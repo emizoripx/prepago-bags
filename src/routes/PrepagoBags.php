@@ -39,9 +39,13 @@ class PrepagoBags {
         Route::post('superu/login', [AdminLoginController::class, 'login'])->name('admin.login');
         Route::get('superu/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
         
-        Route::group(['namespace' => "\EmizorIpx\PrepagoBags\Http\Controllers"], function () {
+        Route::group(['namespace' => "\EmizorIpx\PrepagoBags\Http\Controllers", 'middleware' => ['auth:admin']], function () {
                 
             Route::get('dashboard', 'DashboardController@dashboard')->name('admin.dashboard');
+            
+            Route::get('dashboard/administrators', 'DashboardController@administrators')->name('admin.administrators');
+            Route::post('dashboard/administrators', 'DashboardController@storeAdministrator')->name('admin.administrators.store');
+            Route::post('dashboard/administrators/{id}/toggle', 'DashboardController@toggleAdministrator')->name('admin.administrators.toggle');
             
             Route::get('dashboard/partner-settings', 'DashboardController@partnerSettings')->name('admin.partner.settings');
             Route::post('dashboard/partner-settings', 'DashboardController@updatePartnerSettings')->name('admin.partner.settings.update');

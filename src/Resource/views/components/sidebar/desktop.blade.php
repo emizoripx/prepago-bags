@@ -31,6 +31,11 @@
             "icon" => "settings",
             "title" => "Configuración Partner",
         ],
+        [
+            "url" => "admin.administrators",
+            "icon" => "shield",
+            "title" => "Administradores",
+        ],
     ];
 
     $companyName = isset($company) && isset($company->settings) ? (json_decode($company->settings)->name ?? 'Compañía') : 'Compañía';
